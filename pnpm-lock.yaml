@@ -85,3 +85,90 @@ importers:
         version: 5.7.9(@types/node@22.14.1)(jiti@1.21.7)(lightningcss@1.29.3)(rollup@2.79.2)(sass@1.80.4)(stylus@0.64.0)(terser@5.39.0)(typescript@5.8.3)(yaml@2.7.0)
       astro-expressive-code:
         specifier: ^0.41.3
+        version: 0.41.3(astro@5.7.9(@types/node@22.14.1)(jiti@1.21.7)(lightningcss@1.29.3)(rollup@2.79.2)(sass@1.80.4)(stylus@0.64.0)(terser@5.39.0)(typescript@5.8.3)(yaml@2.7.0))
+      astro-icon:
+        specifier: ^1.1.5
+        version: 1.1.5
+      hastscript:
+        specifier: ^9.0.1
+        version: 9.0.1
+      katex:
+        specifier: ^0.16.22
+        version: 0.16.22
+      markdown-it:
+        specifier: ^14.1.0
+        version: 14.1.0
+      mdast-util-to-string:
+        specifier: ^4.0.0
+        version: 4.0.0
+      node-html-parser:
+        specifier: ^7.0.1
+        version: 7.0.1
+      overlayscrollbars:
+        specifier: ^2.11.1
+        version: 2.11.1
+      photoswipe:
+        specifier: ^5.4.4
+        version: 5.4.4
+      react:
+        specifier: ^19.2.3
+        version: 19.2.3
+      react-dom:
+        specifier: ^19.2.3
+        version: 19.2.3(react@19.2.3)
+      reading-time:
+        specifier: ^1.5.0
+        version: 1.5.0
+      rehype-autolink-headings:
+        specifier: ^7.1.0
+        version: 7.1.0
+      rehype-components:
+        specifier: ^0.3.0
+        version: 0.3.0
+      rehype-external-links:
+        specifier: ^3.0.0
+        version: 3.0.0
+      rehype-katex:
+        specifier: ^7.0.1
+        version: 7.0.1
+      rehype-slug:
+        specifier: ^6.0.0
+        version: 6.0.0
+      remark-directive:
+        specifier: ^3.0.1
+        version: 3.0.1
+      remark-directive-rehype:
+        specifier: ^0.4.2
+        version: 0.4.2
+      remark-github-admonitions-to-directives:
+        specifier: ^1.0.5
+        version: 1.0.5
+      remark-math:
+        specifier: ^6.0.0
+        version: 6.0.0
+      remark-sectionize:
+        specifier: ^2.1.0
+        version: 2.1.0
+      sanitize-html:
+        specifier: ^2.16.0
+        version: 2.16.0
+      sharp:
+        specifier: ^0.34.1
+        version: 0.34.1
+      sql.js:
+        specifier: ^1.13.0
+        version: 1.13.0
+      stylus:
+        specifier: ^0.64.0
+        version: 0.64.0
+      svelte:
+        specifier: ^5.28.2
+        version: 5.28.2
+      tailwindcss:
+        specifier: ^3.4.17
+        version: 3.4.17
+      three:
+        specifier: ^0.182.0
+        version: 0.182.0
+      typescript:
+        specifier: ^5.8.3
