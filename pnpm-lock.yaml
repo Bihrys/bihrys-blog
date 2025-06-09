@@ -1825,3 +1825,90 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22}
     peerDependencies:
       '@sveltejs/vite-plugin-svelte': ^5.0.0
+      svelte: ^5.0.0
+      vite: ^6.0.0
+
+  '@sveltejs/vite-plugin-svelte@5.0.3':
+    resolution: {integrity: sha512-MCFS6CrQDu1yGwspm4qtli0e63vaPCehf6V7pIMP15AsWgMKrqDGCPFF/0kn4SP0ii4aySu4Pa62+fIRGFMjgw==}
+    engines: {node: ^18.0.0 || ^20.0.0 || >=22}
+    peerDependencies:
+      svelte: ^5.0.0
+      vite: ^6.0.0
+
+  '@swc/helpers@0.5.17':
+    resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
+
+  '@swup/a11y-plugin@5.0.0':
+    resolution: {integrity: sha512-t0pVWAVea+Imjj05n9QMPfqZhw9i5rx7BV/l3Ejeic+X3Qs0VZwVvEJIcdqireCVJgAJGZAPlmgbiuaj5UHJaQ==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/astro@1.6.0':
+    resolution: {integrity: sha512-xj87BM/tAJSDWG8gwr4Tx7H7FIkimhnAlHP2/xM7oF32BAu9dTVXNVJwX1sNcNv9estAyHFygzuxz4Jug1ZATg==}
+
+  '@swup/body-class-plugin@3.3.0':
+    resolution: {integrity: sha512-4h/6mAgDd0+ml8Gc2kX8tikIR0HZZLF+WTnfm0JTVrGDw74bgEBenbsaWFfIS+gn4RWKZdWBUOfaZ+Im5J7Gvw==}
+    peerDependencies:
+      swup: ^4.6.0
+
+  '@swup/browserslist-config@1.0.1':
+    resolution: {integrity: sha512-/3nBqG7LqmK1uqaCSTA6s2NwQBDQXNyLAFBzlX6uaxqjIQcAZyq6K+sgcQ40oj02Vn/2mLSkeL9DOfP7BPOwVA==}
+
+  '@swup/debug-plugin@4.1.0':
+    resolution: {integrity: sha512-R+RP4hjoeXrO+wowSswaTM4P05lu6iDg6UwdbQn0wfJ082KiUpH+DDwHYNOatxusKVExFuhLec+X9IbyAyiv8w==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/fade-theme@2.0.1':
+    resolution: {integrity: sha512-viQ23vcv47lTz2nYFSDqYR0cbfAEvWOtsNepERGDD221guwSHU7lNz3zDfvWsFGSjP/nCmMUGS5p204rizkdgw==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/forms-plugin@3.6.0':
+    resolution: {integrity: sha512-pRN6OR5wR27LvJqQOlCgu1fP9Z0ZsGauxWOE6nRCtjP1+98wlGTMiMsQ+jGvvs+IOK9IDTJQ7jvprnJAZaw9zw==}
+    peerDependencies:
+      swup: ^4.6.0
+
+  '@swup/head-plugin@2.3.1':
+    resolution: {integrity: sha512-kdv60fO9c0/3+K40f7Fj/uV34nSuuPeCsld83J5uVVFizOmoovA737C5M1Iqac5Spf2GLU7q+mhN6AbohSIBjA==}
+    peerDependencies:
+      swup: ^4.6.0
+
+  '@swup/overlay-theme@2.0.1':
+    resolution: {integrity: sha512-8SGIvq8av5cFTxaYy1isZsQXWme2d1onE/cy4QpsyRlxiyhzXbYDAgrBLZzY0Ev8TGf3dYFxXg195eOMW1OP+Q==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/parallel-plugin@0.4.0':
+    resolution: {integrity: sha512-un37RpdFz2vuJV1r9Hr0nCl5qgloN/Z3SczC3wi1XfkiHtzZ8kFTcm5pIW5rUkDVwtCTil44mlAA/STouBEgDw==}
+    peerDependencies:
+      swup: ^4.6.0
+
+  '@swup/plugin@3.0.1':
+    resolution: {integrity: sha512-A9yiJeKTmQ9kac2Eo3MbMWW+Tiw23W5OSzAHVTCfW6n5zze6dexY3FLEUSDTcvRgciknvXfMZ9JTnebbvCKKWw==}
+    hasBin: true
+
+  '@swup/plugin@4.0.0':
+    resolution: {integrity: sha512-3Kq31BJxnzoPg643YxGoWQggoU6VPKZpdE5CqqmP7wwkpCYTzkRmrfcQ29mGhsSS7xfS7D33iZoBiwY+wPoo2A==}
+
+  '@swup/preload-plugin@3.2.11':
+    resolution: {integrity: sha512-dq50u+d8L+63/pU6dUDnypuBoF49ubjRzRJqitGem2K7wRn7xccxRSvdyeGKdA2vNvzGDAmLfwVTZdSotvvDrw==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/prettier-config@1.1.0':
+    resolution: {integrity: sha512-EF4DMdIGieEsuY2XK0PuLf7Uw7yUQOMbA6IdCMvvRvKXj03WLLpnNIFfFp+6hmMtXRSUE88VBpRyp6Giiu1Pbg==}
+
+  '@swup/progress-plugin@3.2.0':
+    resolution: {integrity: sha512-Ur+D4+aee9swR6pn7JbEyGMwVP1BTcN5ygjlno7IaSQ/vMZbuJ73po1RkKlIi86p+/PZ+1kynkH4K4eMZuHKKg==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/route-name-plugin@4.1.0':
+    resolution: {integrity: sha512-1tw3WeExEKwI3pVMXTptCGxFUDOSEpc63D741eeUCjjGW/f9q7ekuqEaPQd5YJ6POpzDjdt1jjuC9yv54CbeXA==}
+    peerDependencies:
+      swup: ^4.0.0
+
+  '@swup/scripts-plugin@2.1.0':
+    resolution: {integrity: sha512-JSMFsFCN9gn4q3m1Ccv0gq3gwRoZl6UGALOQO3OeQ8wOIq9vPC5dcUD3CMBuaPanksjR4GC8ZoukIjHrlT52fg==}
+    peerDependencies:
