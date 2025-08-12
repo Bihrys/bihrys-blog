@@ -6697,3 +6697,90 @@ snapshots:
     optional: true
 
   '@esbuild/netbsd-x64@0.25.3':
+    optional: true
+
+  '@esbuild/openbsd-arm64@0.25.3':
+    optional: true
+
+  '@esbuild/openbsd-x64@0.25.3':
+    optional: true
+
+  '@esbuild/sunos-x64@0.25.3':
+    optional: true
+
+  '@esbuild/win32-arm64@0.25.3':
+    optional: true
+
+  '@esbuild/win32-ia32@0.25.3':
+    optional: true
+
+  '@esbuild/win32-x64@0.25.3':
+    optional: true
+
+  '@expressive-code/core@0.41.3':
+    dependencies:
+      '@ctrl/tinycolor': 4.1.0
+      hast-util-select: 6.0.4
+      hast-util-to-html: 9.0.5
+      hast-util-to-text: 4.0.2
+      hastscript: 9.0.1
+      postcss: 8.5.3
+      postcss-nested: 6.2.0(postcss@8.5.3)
+      unist-util-visit: 5.0.0
+      unist-util-visit-parents: 6.0.1
+
+  '@expressive-code/plugin-collapsible-sections@0.41.3':
+    dependencies:
+      '@expressive-code/core': 0.41.3
+
+  '@expressive-code/plugin-frames@0.41.3':
+    dependencies:
+      '@expressive-code/core': 0.41.3
+
+  '@expressive-code/plugin-line-numbers@0.41.3':
+    dependencies:
+      '@expressive-code/core': 0.41.3
+
+  '@expressive-code/plugin-shiki@0.41.3':
+    dependencies:
+      '@expressive-code/core': 0.41.3
+      shiki: 3.3.0
+
+  '@expressive-code/plugin-text-markers@0.41.3':
+    dependencies:
+      '@expressive-code/core': 0.41.3
+
+  '@fancyapps/ui@6.0.5': {}
+
+  '@fontsource-variable/jetbrains-mono@5.2.5': {}
+
+  '@fontsource/roboto@5.2.5': {}
+
+  '@iconify-json/fa6-brands@1.2.5':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/fa6-regular@1.2.3':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/fa6-solid@1.2.3':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/material-symbols@1.2.20':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/simple-icons@1.2.42':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify/svelte@4.2.0(svelte@5.28.2)':
+    dependencies:
+      '@iconify/types': 2.0.0
+      svelte: 5.28.2
+
+  '@iconify/tools@4.1.2':
+    dependencies:
+      '@iconify/types': 2.0.0
