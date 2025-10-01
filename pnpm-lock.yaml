@@ -10786,3 +10786,90 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.40.1
       '@rollup/rollup-win32-x64-msvc': 4.40.1
       fsevents: 2.3.3
+
+  run-parallel@1.2.0:
+    dependencies:
+      queue-microtask: 1.2.3
+
+  sade@1.8.1:
+    dependencies:
+      mri: 1.2.0
+
+  safe-array-concat@1.1.3:
+    dependencies:
+      call-bind: 1.0.8
+      call-bound: 1.0.4
+      get-intrinsic: 1.3.0
+      has-symbols: 1.1.0
+      isarray: 2.0.5
+
+  safe-buffer@5.2.1: {}
+
+  safe-identifier@0.4.2: {}
+
+  safe-push-apply@1.0.0:
+    dependencies:
+      es-errors: 1.3.0
+      isarray: 2.0.5
+
+  safe-regex-test@1.1.0:
+    dependencies:
+      call-bound: 1.0.4
+      es-errors: 1.3.0
+      is-regex: 1.2.1
+
+  safer-buffer@2.1.2: {}
+
+  sanitize-html@2.16.0:
+    dependencies:
+      deepmerge: 4.3.1
+      escape-string-regexp: 4.0.0
+      htmlparser2: 8.0.2
+      is-plain-object: 5.0.0
+      parse-srcset: 1.0.2
+      postcss: 8.5.3
+
+  sass@1.80.4:
+    dependencies:
+      '@parcel/watcher': 2.5.1
+      chokidar: 4.0.3
+      immutable: 4.3.7
+      source-map-js: 1.2.1
+    optional: true
+
+  sax@1.4.1: {}
+
+  scheduler@0.27.0: {}
+
+  scrl@2.0.0: {}
+
+  semver@6.3.1: {}
+
+  semver@7.7.1: {}
+
+  serialize-javascript@4.0.0:
+    dependencies:
+      randombytes: 2.1.0
+
+  set-function-length@1.2.2:
+    dependencies:
+      define-data-property: 1.1.4
+      es-errors: 1.3.0
+      function-bind: 1.1.2
+      get-intrinsic: 1.3.0
+      gopd: 1.2.0
+      has-property-descriptors: 1.0.2
+
+  set-function-name@2.0.2:
+    dependencies:
+      define-data-property: 1.1.4
+      es-errors: 1.3.0
+      functions-have-names: 1.2.3
+      has-property-descriptors: 1.0.2
+
+  set-proto@1.0.0:
+    dependencies:
+      dunder-proto: 1.0.1
+      es-errors: 1.3.0
+      es-object-atoms: 1.1.1
+
