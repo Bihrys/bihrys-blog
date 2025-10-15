@@ -85,3 +85,90 @@ export default defineConfig({
             overridesByLang: {
                 'shellsession': {
                     showLineNumbers: false,
+                },
+            },
+        },
+        styleOverrides: {
+            codeBackground: "var(--codeblock-bg)",
+            borderRadius: "0.25rem",
+            borderColor: "none",
+            codeFontSize: "0.875rem",
+            codeFontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+            codeLineHeight: "1.5rem",
+            frames: {
+                editorBackground: "var(--codeblock-bg)",
+                terminalBackground: "var(--codeblock-bg)",
+                terminalTitlebarBackground: "var(--codeblock-topbar-bg)",
+                editorTabBarBackground: "var(--codeblock-topbar-bg)",
+                editorActiveTabBackground: "none",
+                editorActiveTabIndicatorBottomColor: "var(--primary)",
+                editorActiveTabIndicatorTopColor: "none",
+                editorTabBarBorderBottomColor: "var(--codeblock-topbar-bg)",
+                terminalTitlebarBorderBottomColor: "none"
+            },
+            textMarkers: {
+                delHue: 0,
+                insHue: 180,
+                markHue: 250
+            }
+        },
+        frames: {
+            showCopyToClipboardButton: false,
+        }
+    }),
+    ],
+    markdown: {
+        remarkPlugins: [
+            remarkMath,
+            remarkReadingTime,
+            remarkExcerpt,
+            remarkGithubAdmonitionsToDirectives,
+            remarkDirective,
+            remarkSectionize,
+            parseDirectiveNode,
+        ],
+        rehypePlugins: [
+            rehypeHeadingShift, // 必须放在最前面，将 h1 降级为 h2，避免多个 h1 的 SEO 问题
+            rehypeKatex,
+            rehypeSlug,
+            [rehypeImageFallback, imageFallbackConfig],
+            rehypeImageAttrs,
+            [
+                rehypeComponents,
+                {
+                    components: {
+                        github: GithubCardComponent,
+                        link: LinkCardComponent,
+                        note: (x, y) => AdmonitionComponent(x, y, "note"),
+                        tip: (x, y) => AdmonitionComponent(x, y, "tip"),
+                        important: (x, y) => AdmonitionComponent(x, y, "important"),
+                        caution: (x, y) => AdmonitionComponent(x, y, "caution"),
+                        warning: (x, y) => AdmonitionComponent(x, y, "warning"),
+                    },
+                },
+            ],
+            [
+                rehypeExternalLinks,
+                {
+                    target: '_blank',
+                },
+            ],
+            [
+                rehypeAutolinkHeadings,
+                {
+                    behavior: "append",
+                    properties: {
+                        className: ["anchor"],
+                    },
+                    content: {
+                        type: "element",
+                        tagName: "span",
+                        properties: {
+                            className: ["anchor-icon"],
+                            "data-pagefind-ignore": true,
+                        },
+                        children: [
+                            {
+                                type: "text",
+                                value: "#",
+                            },
