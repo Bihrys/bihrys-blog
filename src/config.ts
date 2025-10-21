@@ -85,3 +85,72 @@ export const navBarConfig: NavBarConfig = {
 			url: "/about/",
 		},
 		{
+			name: "AI Relay",
+			url: "https://ai.bihrys.com",
+			external: true,
+		},
+	],
+};
+
+export const profileConfig: ProfileConfig = {
+	avatar: "/images/avatar.jpeg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+	name: "Bihrys",
+	bio: ["心臓は点滅するかしら……"],
+	links: [
+		{
+			name: "Email",
+			icon: "material-symbols:mail-rounded",
+			url: "mailto:3200769991@qq.com",
+		},
+		{
+			name: "Bilibili",
+			icon: "fa6-brands:bilibili",
+			url: "https://space.bilibili.com/1124230309",
+		},
+		{
+			name: "GitHub",
+			icon: "fa6-brands:github",
+			url: "https://github.com/Bihrys",
+		},
+	],
+};
+
+export const licenseConfig: LicenseConfig = {
+	enable: true,
+	name: "CC BY-NC-SA 4.0",
+	url: "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+};
+
+//图片回退（本地图片为主，关闭双图床容灾）
+export const imageFallbackConfig: ImageFallbackConfig = {
+	enable: false,
+	originalDomain: "",
+	fallbackDomain: "",
+};
+
+// 统计服务：暂时关闭（浏览量/热门排行相关功能不生效）
+export const umamiConfig: UmamiConfig = {
+	enable: false,
+	baseUrl: "",
+	shareId: "",
+	timezone: "Asia/Shanghai",
+};
+
+// 防盗链/域名保护配置
+export const antiLeechConfig: AntiLeechConfig = {
+	enable: true,
+	officialSites: [{ url: "https://bihrys.com", name: "主站" }],
+	debug: false,
+	warningTitle: "⚠️ 域名安全警告",
+	warningMessage:
+		"您可能正在访问非官方网站，存在安全风险！建议跳转到官方网站。",
+};
+
+export const googleAnalyticsConfig = {
+	enable: false,
+	measurementId: "",
+};
+
+export const expressiveCodeConfig: ExpressiveCodeConfig = {
+	theme: "github-dark",
+};
