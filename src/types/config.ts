@@ -85,3 +85,70 @@ export type NavBarGroup = {
 export type NavBarConfig = {
 	links: (NavBarLink | LinkPreset | NavBarGroup)[];
 };
+
+export type ProfileConfig = {
+	avatar?: string;
+	name: string;
+	bio?: string | string[];
+	links: {
+		name: string;
+		url: string;
+		icon: string;
+	}[];
+};
+
+export type LicenseConfig = {
+	enable: boolean;
+	name: string;
+	url: string;
+};
+
+export type ImageFallbackConfig = {
+	enable: boolean;
+	originalDomain: string;
+	fallbackDomain: string;
+};
+
+export type UmamiConfig = {
+	enable: boolean;
+	baseUrl: string;
+	// Optional: only needed if your implementation requires a separate share route ID
+	shareId?: string;
+	timezone: string;
+};
+
+// 防盗链/域名保护配置
+export type AntiLeechConfig = {
+	enable: boolean;
+	// 官方域名列表（支持字符串或对象格式）
+	officialSites: (string | { url: string; name?: string })[];
+	// 是否在控制台输出调试信息
+	debug?: boolean;
+	// 自定义警告标题
+	warningTitle?: string;
+	// 自定义警告消息
+	warningMessage?: string;
+};
+
+export type LIGHT_DARK_MODE =
+	| typeof LIGHT_MODE
+	| typeof DARK_MODE
+	| typeof AUTO_MODE;
+
+export type BlogPostData = {
+	body: string;
+	title: string;
+	published: Date;
+	description: string;
+	tags: string[];
+	draft?: boolean;
+	image?: string;
+	prevTitle?: string;
+	prevSlug?: string;
+	nextTitle?: string;
+	nextSlug?: string;
+};
+
+export type ExpressiveCodeConfig = {
+	theme: string;
+};
