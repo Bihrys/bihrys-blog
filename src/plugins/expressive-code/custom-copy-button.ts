@@ -85,3 +85,6 @@ export function pluginCustomCopyButton() {
 
 				traverse(context.renderData.blockAst);
 			},
+		},
+	});
+}
