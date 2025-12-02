@@ -85,3 +85,42 @@ export function initReadingProgress() {
 	// 初始更新
 	updateProgress();
 
+	if (!initialized) {
+		window.addEventListener("scroll", updateProgress, { passive: true });
+		initialized = true;
+
+		cleanup = () => {
+			window.removeEventListener("scroll", updateProgress);
+			initialized = false;
+			sidebarCardRef = null;
+			postContainerRef = null;
+		};
+	}
+}
+
+export function destroyReadingProgress() {
+	if (cleanup) {
+		cleanup();
+		cleanup = null;
+	}
+}
+
+// Swup 页面切换支持
+function setupSwupHooks() {
+	if (!window.swup?.hooks) return;
+
+	window.swup.hooks.on("page:view", () => {
+		// 重置并重新初始化
+		sidebarCardRef = null;
+		setTimeout(initReadingProgress, 50);
+	});
+}
+
+// 自动初始化
+if (typeof window !== "undefined") {
+	if (window.swup?.hooks) {
+		setupSwupHooks();
+	} else {
+		document.addEventListener("swup:enable", setupSwupHooks);
+	}
+}
