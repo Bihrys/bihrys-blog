@@ -85,3 +85,90 @@
         active:scale-90;
         &:not(.scale-animation) {
             @apply hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)];
+        }
+        &.scale-animation {
+            @apply expand-animation;
+            &.current-theme-btn {
+                @apply before:scale-100 before:opacity-100 before:bg-[var(--btn-plain-bg-hover)] text-[var(--primary)];
+            }
+        }
+    }
+
+    .btn-regular {
+        @apply transition-all duration-300 flex items-center justify-center bg-[var(--btn-regular-bg)] 
+        hover:bg-[var(--btn-regular-bg-hover)] active:bg-[var(--btn-regular-bg-active)] active:scale-95
+        text-[var(--btn-content)] dark:text-white/75 rounded-lg shadow-sm hover:shadow-md;
+    }
+
+    .link-underline {
+        @apply transition underline decoration-2 decoration-dashed decoration-[var(--link-underline)]
+        hover:decoration-[var(--link-hover)] active:decoration-[var(--link-active)] underline-offset-[0.25rem];
+    }
+
+    .toc-hide,
+    .toc-not-ready {
+        @apply opacity-0 pointer-events-none translate-x-4;
+    }
+
+    #toc-inner-wrapper #toc {
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 2rem, black calc(100% - 2rem), transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0%, black 2rem, black calc(100% - 2rem), transparent 100%);
+    }
+
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        /* stylelint-disable-next-line property-no-unknown */
+        scrollbar-width: none;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    .text-90 {
+        @apply text-black/90 dark:text-white/90;
+    }
+    .text-75 {
+        @apply text-black/75 dark:text-white/75;
+    }
+    .text-50 {
+        @apply text-black/50 dark:text-white/50;
+    }
+    .text-30 {
+        @apply text-black/30 dark:text-white/30;
+    }
+    .text-25 {
+        @apply text-black/25 dark:text-white/25;
+    }
+
+    .meta-icon {
+        @apply w-8 h-8 transition rounded-md flex items-center justify-center bg-[var(--btn-regular-bg)]
+        text-[var(--btn-content)] mr-2 hover:text-[var(--primary)];
+    }
+    .with-divider {
+        @apply before:content-['/'] before:ml-1.5 before:mr-1.5 before:text-[var(--meta-divider)] before:text-sm
+        before:font-medium before:first-of-type:hidden before:transition;
+    }
+
+    .btn-regular-dark {
+        @apply flex items-center justify-center transition-all duration-300
+        bg-[oklch(0.45_0.01_var(--hue))] hover:bg-[oklch(0.50_0.01_var(--hue))] active:bg-[oklch(0.55_0.01_var(--hue))]
+        dark:bg-[oklch(0.30_0.02_var(--hue))] dark:hover:bg-[oklch(0.35_0.03_var(--hue))] dark:active:bg-[oklch(0.40_0.03_var(--hue))]
+        active:scale-95 text-white shadow-md hover:shadow-lg;
+    }
+    .btn-regular-dark.success {
+        @apply bg-[oklch(0.75_0.14_var(--hue))] dark:bg-[oklch(0.75_0.14_var(--hue))];
+    }
+}
+
+.custom-md img, #post-cover img {
+    @apply cursor-zoom-in transition-transform duration-500 hover:scale-[1.01];
+}
+
+::selection {
+    background-color: var(--selection-bg);
+}
+
+.dash-line {
+    position: relative;
