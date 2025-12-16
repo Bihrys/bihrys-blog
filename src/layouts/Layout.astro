@@ -1,0 +1,87 @@
+---
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+
+import {
+	antiLeechConfig,
+	googleAnalyticsConfig,
+	profileConfig,
+	siteConfig,
+} from "@/config";
+import AntigravityBg from "@components/AntigravityBg.tsx";
+import ConfigCarrier from "@components/ConfigCarrier.astro";
+import FloatingControls from "@components/FloatingControls.svelte";
+import ReadingProgressMobile from "@components/ReadingProgressMobile.svelte";
+import {
+	AUTO_MODE,
+	BANNER_HEIGHT,
+	BANNER_HEIGHT_EXTEND,
+	BANNER_HEIGHT_HOME,
+	DARK_MODE,
+	DEFAULT_THEME,
+	LIGHT_MODE,
+	PAGE_WIDTH,
+} from "../constants/constants";
+import { defaultFavicons } from "../constants/icon";
+import type { Favicon } from "../types/config";
+import { url, pathsEqual } from "../utils/url-utils";
+import "katex/dist/katex.css";
+
+interface Props {
+	title?: string;
+	banner?: string;
+	description?: string;
+	lang?: string;
+	setOGTypeArticle?: boolean;
+}
+
+let { title, banner, description, lang, setOGTypeArticle } = Astro.props;
+
+const ogImage =
+	banner && banner.trim() !== "" ? new URL(banner, Astro.site).href : undefined;
+
+// apply a class to the body element to decide the height of the banner, only used for initial page load
+// Swup can update the body for each page visit, but it's after the page transition, causing a delay for banner height change
+// so use Swup hooks instead to change the height immediately when a link is clicked
+const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
+
+// defines global css variables
+// why doing this in Layout instead of GlobalStyles: https://github.com/withastro/astro/issues/6728#issuecomment-1502203757
+const configHue = siteConfig.themeColor.hue;
+if (!banner || typeof banner !== "string" || banner.trim() === "") {
+	banner = siteConfig.banner.src;
+}
+
+// TODO don't use post cover as banner for now
+banner = siteConfig.banner.src;
+
+const enableBanner = siteConfig.banner.enable;
+
+let pageTitle: string;
+if (title) {
+	pageTitle = `${title} - ${siteConfig.title}`;
+} else {
+	if (siteConfig.subtitle && siteConfig.subtitle.trim() !== "") {
+		pageTitle = `${siteConfig.title} - ${siteConfig.subtitle}`;
+	} else {
+		pageTitle = siteConfig.title;
+	}
+}
+
+// Use siteConfig.description as fallback for meta description when no description is provided
+if (!description) {
+	description = siteConfig.description || pageTitle;
+}
+
+const favicons: Favicon[] =
+	siteConfig.favicon.length > 0 ? siteConfig.favicon : defaultFavicons;
+
+// const siteLang = siteConfig.lang.replace('_', '-')
+if (!lang) {
+	lang = `${siteConfig.lang}`;
+}
+const siteLang = lang.replace("_", "-");
+
+const bannerOffsetByPosition = {
+	top: `${BANNER_HEIGHT_EXTEND}vh`,
