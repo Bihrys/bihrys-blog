@@ -85,3 +85,90 @@ const siteLang = lang.replace("_", "-");
 
 const bannerOffsetByPosition = {
 	top: `${BANNER_HEIGHT_EXTEND}vh`,
+	center: `${BANNER_HEIGHT_EXTEND / 2}vh`,
+	bottom: "0",
+};
+const bannerOffset =
+	bannerOffsetByPosition[siteConfig.banner.position || "center"];
+---
+
+<!DOCTYPE html>
+<html lang={siteLang} class="bg-[var(--page-bg)] transition text-[14px] md:text-[16px]"
+	  data-overlayscrollbars-initialize
+	  data-bg-fixed={siteConfig.background.src}
+	  data-bg-fixed-landscape={siteConfig.background.srcLandscape}
+	  data-bg-fixed-portrait={siteConfig.background.srcPortrait}
+	  data-bg-random={siteConfig.background.randomSrc}
+>
+	<head>
+
+		<title>{pageTitle}</title>
+
+		<meta charset="UTF-8" />
+
+		<meta name="description" content={description}>
+		<meta name="author" content={profileConfig.name}>
+		<meta name="msvalidate.01" content="D45C7B22F1891C5B0E4D62E9333D4D05" />
+		{siteConfig.keywords && (
+			<meta name="keywords" content={siteConfig.keywords.join(", ")}>
+		)}
+
+		<meta property="og:site_name" content={siteConfig.title}>
+		<meta property="og:url" content={Astro.url}>
+		<meta property="og:title" content={pageTitle}>
+		<meta property="og:description" content={description}>
+		{setOGTypeArticle ? (
+        <meta property="og:type" content="article" />
+        ) : (
+        <meta property="og:type" content="website" />
+        )}
+
+		<link rel="canonical" href={Astro.url} />
+
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="twitter:url" content={Astro.url}>
+		<meta name="twitter:title" content={pageTitle}>
+		<meta name="twitter:description" content={description}>
+		{ogImage && <meta property="og:image" content={ogImage} />}
+		{ogImage && <meta name="twitter:image" content={ogImage} />}
+
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<!-- Preload removed: 对于随机图 API 预加载没有意义，且会导致 credentials mode 警告 -->
+		
+		{/* <!-- Content Security Policy -->
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://giscus.app https://hpic.072103.xyz https://umami.2x.nz https://hm.baidu.com https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://static.cloudflareinsights.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://giscus.app https://fonts.googleapis.com https://api.iconify.design; font-src 'self' https://fonts.gstatic.com https://api.iconify.design; img-src 'self' data: https: http:; connect-src 'self' https://umami.2x.nz https://hm.baidu.com https://www.google-analytics.com https://analytics.google.com https://api.iconify.design https://static.cloudflareinsights.com https://pic.2x.nz https://q2.qlogo.cn https://ep1.adtrafficquality.google https://googleads.g.doubleclick.net; frame-src 'self' https://giscus.app *.bilibili.com https://www.google.com https://googleads.g.doubleclick.net https://support.nodeget.com https://*.adtrafficquality.google; object-src 'none'; base-uri 'self'; form-action 'self';"> */}
+		{favicons.map(favicon => (
+			<link rel="icon"
+				  href={favicon.src.startsWith('/') ? url(favicon.src) : favicon.src}
+				  sizes={favicon.sizes}
+				  media={favicon.theme && `(prefers-color-scheme: ${favicon.theme})`}
+			/>
+		))}
+
+		<!-- Set the theme before the page is rendered to avoid a flash -->
+		<script is:inline define:vars={{DEFAULT_THEME, LIGHT_MODE, DARK_MODE, AUTO_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue, forceDarkMode: siteConfig.themeColor.forceDarkMode}}>
+			// Force dark mode if configured
+			if (forceDarkMode) {
+				document.documentElement.classList.add('dark');
+				localStorage.setItem('theme', DARK_MODE);
+			} else {
+				// Load the theme from local storage
+				const theme = localStorage.getItem('theme') || DEFAULT_THEME;
+				switch (theme) {
+					case LIGHT_MODE:
+						document.documentElement.classList.remove('dark');
+						break
+					case DARK_MODE:
+						document.documentElement.classList.add('dark');
+						break
+					case AUTO_MODE:
+						if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+							document.documentElement.classList.add('dark');
+						} else {
+							document.documentElement.classList.remove('dark');
+						}
+				}
+			}
+
+			// Load the hue from local storage
