@@ -259,3 +259,90 @@ const bannerOffset =
 				// Background image loading detection with mobile support and fallback
 				const bgUrl = (getComputedStyle(document.documentElement).getPropertyValue('--bg-url-active').trim()
 					|| getComputedStyle(document.documentElement).getPropertyValue('--bg-url').trim());
+				const bgEnable = getComputedStyle(document.documentElement).getPropertyValue('--bg-enable').trim();
+			
+			//console.log('[BG Debug] URL:', bgUrl, 'Enable:', bgEnable);
+			
+			if (bgUrl && bgUrl !== 'none' && bgEnable === '1') {
+				const urlMatch = bgUrl.match(/url\(["']?([^"')]+)["']?\)/);
+				//console.log('[BG Debug] URL Match:', urlMatch);
+				
+				if (urlMatch) {
+					let imageUrl = urlMatch[1];
+					//console.log('[BG Debug] Loading:', imageUrl);
+					
+					const img = new Image();
+					// 注意：移除 crossOrigin 属性，CSS 背景图不需要 CORS
+					// img.crossOrigin = 'anonymous'; // 暂时禁用，简化调试
+					
+					img.onload = function() {
+						//console.log('[BG Debug] Image loaded successfully');
+						document.body.classList.add('bg-loaded');
+						document.documentElement.style.setProperty('--card-bg', 'var(--card-bg-transparent)');
+						document.documentElement.style.setProperty('--float-panel-bg', 'var(--float-panel-bg-transparent)');
+					};
+					
+					img.onerror = function(e) {
+						// 加载失败时直接显示背景（暂时禁用备用图床，等待 CORS 修复验证后再启用）
+						console.warn('[BG Debug] Image load failed, showing anyway:', e);
+						document.body.classList.add('bg-loaded');
+					};
+					
+					img.src = imageUrl;
+					
+					// 超时保护:5秒后强制显示
+					setTimeout(function() {
+						if (!document.body.classList.contains('bg-loaded')) {
+							console.warn('[BG Debug] Timeout, forcing display');
+							document.body.classList.add('bg-loaded');
+						}
+					}, 5000);
+				}
+			}
+		</script>
+		<style define:vars={{
+			configHue,
+			'page-width': `${PAGE_WIDTH}rem`,
+			'bg-url': siteConfig.background.src ? `url(${siteConfig.background.src})` : 'none',
+			'bg-enable': siteConfig.background.enable ? '1' : '0',
+			'bg-position': siteConfig.background.position || 'center',
+			'bg-size': siteConfig.background.size || 'cover',
+			'bg-repeat': siteConfig.background.repeat || 'no-repeat',
+			'bg-attachment': siteConfig.background.attachment || 'fixed',
+			'bg-opacity': (siteConfig.background.opacity || 0.3).toString()
+		}}>
+			:root {
+				--bg-url: var(--bg-url);
+				--bg-enable: var(--bg-enable);
+				--bg-position: var(--bg-position);
+				--bg-size: var(--bg-size);
+				--bg-repeat: var(--bg-repeat);
+				--bg-attachment: var(--bg-attachment);
+				--bg-opacity: var(--bg-opacity);
+			}
+			
+			/* Background image configuration */
+			body {
+				--bg-enable: var(--bg-enable);
+				--bg-position: var(--bg-position);
+				--bg-size: var(--bg-size);
+				--bg-repeat: var(--bg-repeat);
+				--bg-attachment: var(--bg-attachment);
+				--bg-opacity: var(--bg-opacity);
+			}
+			
+			body::before {
+				content: '' !important;
+				position: fixed !important;
+				top: 0 !important;
+				left: 0 !important;
+				right: 0 !important;
+				bottom: 0 !important;
+				width: 100vw !important;
+				height: 100vh !important;
+				/* iOS Safari 需要明确的高度 */
+				min-height: 100vh !important;
+				min-height: -webkit-fill-available !important;
+				background-image: var(--bg-url-active, var(--bg-url)) !important;
+				background-position: var(--bg-position) !important;
+				background-size: var(--bg-size) !important;
