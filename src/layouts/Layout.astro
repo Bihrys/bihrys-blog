@@ -433,3 +433,90 @@ const bannerOffset =
 			(function(){var _0x={k:'_tpc',s:function(a){return atob(a)},h:window.location.hostname,v:['YmlocnlzLmNvbQ=='],p:['.vercel.app']};if(sessionStorage.getItem(_0x.k))return;var _d=_0x.v.map(function(x){return _0x.s(x)});var _m=_d.some(function(o){return _0x.h===o||_0x.h.endsWith('.'+o)});var _n=_0x.p.some(function(s){return _0x.h.endsWith(s)});var _l=(_0x.h==='localhost'||_0x.h==='127.0.0.1'||_0x.h==='::1'||_0x.h.endsWith('.localhost'));if(_m||_n||_l){sessionStorage.setItem(_0x.k,'1');return}setTimeout(function(){var _css='*{margin:0;padding:0;box-sizing:border-box}.dw-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;animation:dw-fadeIn 0.3s ease}.dw-modal{background:linear-gradient(135deg,rgba(30,30,40,0.95),rgba(20,20,30,0.98));border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;max-width:420px;width:90%;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.05);animation:dw-slideUp 0.4s ease}.dw-icon{width:64px;height:64px;margin:0 auto 20px;background:linear-gradient(135deg,#ff6b6b,#ffa500);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;animation:dw-pulse 2s infinite}.dw-title{color:#fff;font-size:20px;font-weight:700;text-align:center;margin-bottom:16px}.dw-content{color:rgba(255,255,255,0.7);font-size:14px;line-height:1.6;text-align:center;margin-bottom:24px}.dw-domain{display:inline-block;background:rgba(255,107,107,0.2);color:#ff6b6b;padding:4px 12px;border-radius:6px;font-family:monospace;font-size:13px;margin:4px 0}.dw-btns{display:flex;gap:12px;justify-content:center}.dw-btn{padding:12px 28px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none}.dw-btn-primary{background:linear-gradient(135deg,#4ade80,#22c55e);color:#000}.dw-btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 20px -5px rgba(74,222,128,0.4)}.dw-btn-secondary{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.1)}.dw-btn-secondary:hover{background:rgba(255,255,255,0.15)}@keyframes dw-fadeIn{from{opacity:0}to{opacity:1}}@keyframes dw-slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes dw-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}';var _style=document.createElement('style');_style.textContent=_css;document.head.appendChild(_style);var _modal=document.createElement('div');_modal.className='dw-overlay';_modal.innerHTML='<div class="dw-modal"><div class="dw-icon">⚠️</div><div class="dw-title">域名安全提醒</div><div class="dw-content"><div>您当前访问的域名</div><div class="dw-domain">'+_0x.h+'</div><div style="margin:12px 0;color:rgba(255,255,255,0.5)">与官方域名不一致，可能存在安全风险</div></div><div class="dw-btns"><button class="dw-btn dw-btn-primary" id="dw-go">前往官网</button><button class="dw-btn dw-btn-secondary" id="dw-stay">继续访问</button></div></div>';document.body.appendChild(_modal);document.getElementById('dw-go').onclick=function(){window.location.replace('https://'+_d[0]+window.location.pathname+window.location.search)};document.getElementById('dw-stay').onclick=function(){sessionStorage.setItem(_0x.k,'1');_modal.remove();_style.remove()}},800)})();
 		</script>
 
+
+
+		<!-- Cookie 同意弹窗 -->
+		<style>
+			#cookie-consent-banner{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;width:340px;max-width:calc(100vw - 2rem);background:var(--card-bg,rgba(35,38,48,0.95));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.3);transform-origin:bottom right;transform:scale(0);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .25s ease;}
+			#cookie-consent-banner.cc-show{transform:scale(1);opacity:1;}
+			#cookie-consent-banner.cc-hide{animation:cc-shrink .8s cubic-bezier(.4,0,.2,1) forwards;}
+		@keyframes cc-shrink{0%{transform:scale(1);opacity:1;}30%{transform:scale(1.04);opacity:1;}100%{transform:scale(0);opacity:0;}}
+			.cc-title{font-size:15px;font-weight:700;color:var(--text-color,#eee);margin-bottom:10px;}
+			.cc-desc{font-size:12px;line-height:1.6;color:var(--text-color,#ccc);opacity:.85;margin-bottom:14px;}
+			.cc-desc a{color:var(--primary,#a78bfa);text-decoration:underline;}
+			.cc-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+			.cc-always{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-color,#ccc);cursor:pointer;user-select:none;margin-right:auto;}
+			.cc-always input{accent-color:var(--primary,#a78bfa);cursor:pointer;}
+			.cc-btn{padding:6px 16px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;border:none;transition:opacity .2s;}
+			.cc-btn:hover{opacity:.85;}
+			.cc-btn-no{background:transparent;border:1px solid rgba(255,255,255,0.2);color:var(--text-color,#ccc);}
+			.cc-btn-yes{background:var(--primary,#a78bfa);color:#fff;}
+		</style>
+
+	</body>
+</html>
+
+<style is:global define:vars={{
+	bannerOffset,
+	'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
+	'banner-height': `${BANNER_HEIGHT}vh`,
+}}>
+@tailwind components;
+@layer components {
+	.enable-banner.is-home #banner-wrapper {
+		@apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)]
+	}
+	.enable-banner #banner-wrapper {
+		@apply h-[var(--banner-height-home)]
+	}
+
+	.enable-banner.is-home #banner {
+		@apply h-[var(--banner-height-home)] translate-y-0
+	}
+	.enable-banner #banner {
+		@apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)]
+	}
+	.enable-banner.is-home #main-grid {
+		@apply translate-y-[var(--banner-height-extend)];
+	}
+	.enable-banner #top-row {
+		@apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300
+	}
+	.enable-banner.is-home #sidebar-sticky {
+		@apply top-[calc(1rem_-_var(--banner-height-extend))]
+	}
+	.navbar-hidden {
+		@apply opacity-0 -translate-y-16
+	}
+}
+</style>
+
+<script>
+import 'overlayscrollbars/overlayscrollbars.css';
+import {
+	OverlayScrollbars,
+	// ScrollbarsHidingPlugin,
+	// SizeObserverPlugin,
+	// ClickScrollPlugin
+} from 'overlayscrollbars';
+import {getHue, getStoredTheme, setHue, setTheme} from "../utils/setting-utils";
+import {pathsEqual, url} from "../utils/url-utils";
+import {
+	BANNER_HEIGHT,
+	BANNER_HEIGHT_HOME,
+	BANNER_HEIGHT_EXTEND,
+	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT
+} from "../constants/constants";
+import { siteConfig } from '../config';
+
+/* Preload fonts */
+// (async function() {
+// 	try {
+// 		await Promise.all([
+// 			document.fonts.load("400 1em Roboto"),
+// 			document.fonts.load("700 1em Roboto"),
+// 		]);
+// 		document.body.classList.remove("hidden");
+// 	} catch (error) {
+// 		console.log("Failed to load fonts:", error);
+// 	}
