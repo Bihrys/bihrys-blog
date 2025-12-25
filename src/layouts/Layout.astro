@@ -781,3 +781,72 @@ function scrollFunction() {
 		if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
 			navbar.classList.add('navbar-hidden')
 		} else {
+			navbar.classList.remove('navbar-hidden')
+		}
+	}
+}
+window.onscroll = scrollFunction
+
+window.onresize = () => {
+	// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
+	let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
+	offset = offset - offset % 4;
+	document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+}
+
+</script>
+
+<script>
+import { Fancybox } from "@fancyapps/ui"
+import "@fancyapps/ui/dist/fancybox/fancybox.css"
+
+const setup = () => {
+	Fancybox.bind(".custom-md img, #post-cover img", {
+		wheel: 'zoom',
+		clickContent: 'close',
+		dblclickContent: 'zoom',
+		click: 'close',
+		dblclick: 'zoom',
+		Panels: {
+			display: ['counter', 'zoom']
+		},
+		Images: {
+			panning: true,
+			zoom: true,
+			protect: false
+		}
+	})
+
+	window.swup.hooks.on("page:view", () => {
+		Fancybox.bind(".custom-md img, #post-cover img", {
+			wheel: 'zoom',
+			clickContent: 'close',
+			dblclickContent: 'zoom',
+			click: 'close',
+			dblclick: 'zoom',
+			Panels: {
+				display: ['counter', 'zoom']
+			},
+			Images: {
+				panning: true,
+				zoom: true,
+				protect: false
+			}
+		})
+	})
+
+	window.swup.hooks.on(
+		"content:replace",
+		() => {
+			Fancybox.unbind(".custom-md img, #post-cover img")
+		},
+		{ before: true },
+	)
+}
+
+if (window.swup) {
+	setup()
+} else {
+	document.addEventListener("swup:enable", setup)
+}
+</script>
