@@ -172,3 +172,90 @@ onMount(() => {
         background: rgba(0, 0, 0, 0.6);
         border-color: rgba(255, 255, 255, 0.3);
     }
+
+    :global(.dark) .bg-toggle-btn.hidden {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* 退出提示样式 */
+    :global(.bg-exit-hint) {
+        position: fixed;
+        top: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10000;
+        pointer-events: none;
+        animation: slideDown 0.5s ease-out;
+    }
+
+    :global(.bg-exit-hint.fade-out) {
+        animation: fadeOut 0.5s ease-out forwards;
+    }
+
+    :global(.hint-content) {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    :global(.hint-icon) {
+        font-size: 1.5rem;
+        animation: bounce 1s ease-in-out infinite;
+    }
+
+    :global(.hint-text) {
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    @keyframes fadeOut {
+        to {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-10px);
+        }
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-5px);
+        }
+    }
+
+    /* 桌面端适配 */
+    @media (min-width: 1024px) {
+        .bg-toggle-btn {
+            bottom: 5.25rem;
+            right: 10rem;
+        }
+    }
+
+    /* 平板端适配 */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .bg-toggle-btn {
+            bottom: 5.25rem;
+            right: 1.5rem;
+            width: 3rem;
+            height: 3rem;
