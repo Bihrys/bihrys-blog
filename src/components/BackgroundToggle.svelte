@@ -259,3 +259,52 @@ onMount(() => {
             right: 1.5rem;
             width: 3rem;
             height: 3rem;
+        }
+
+        .bg-toggle-btn.hidden {
+            width: 4rem;
+            height: 4rem;
+        }
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 767px) {
+        .bg-toggle-btn {
+            bottom: 4.25rem;
+            right: 1rem;
+            width: 2.75rem;
+            height: 2.75rem;
+        }
+
+        .bg-toggle-btn.hidden {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        :global(.hint-content) {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+        }
+
+        :global(.hint-icon) {
+            font-size: 1.25rem;
+        }
+
+        :global(.hint-text) {
+            font-size: 0.875rem;
+        }
+    }
+
+    /* 超小屏幕 */
+    @media (max-width: 480px) {
+        :global(.bg-exit-hint) {
+            max-width: 90vw;
+        }
+
+        :global(.hint-content) {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+    }
+</style>
