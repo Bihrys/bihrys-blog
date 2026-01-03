@@ -85,3 +85,8 @@ const getPageUrl = (p: number) => {
        aria-disabled={!page.url.next ? "true" : undefined}
        class:list={["btn-card overflow-hidden rounded-lg text-[var(--primary)] w-11 h-11",
            {"disabled": page.url.next == undefined}
+       ]}
+    >
+        <Icon name="material-symbols:chevron-right-rounded" class="text-[1.75rem]"></Icon>
+    </a>
+</div>
