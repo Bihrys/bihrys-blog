@@ -172,3 +172,90 @@ function applySavedSort() {
 				localStorage.setItem("post-sort-mode", "published");
 			} else if (savedSort && savedSort !== "published") {
 				const savedIndex = sortModes.findIndex((m) => m.key === savedSort);
+				if (savedIndex !== -1) {
+					currentSortIndex = savedIndex;
+					waitAndSort(savedSort);
+				}
+			} else {
+				currentSortIndex = 0;
+			}
+		}
+	} else {
+		isHomePage = false;
+		isHotPage = false;
+		isPostPage = /^\/posts\//.test(currentPath);
+	}
+}
+
+// 等待条件满足后执行排序
+function waitAndSort(mode: SortMode, retries = 0) {
+	const maxRetries = 20; // 最多等待约4秒
+	const container = document.querySelector(".post-list-container");
+
+	if (!container || container.children.length === 0) {
+		// DOM 未就绪，继续等待
+		if (retries < maxRetries) {
+			setTimeout(() => waitAndSort(mode, retries + 1), 200);
+		}
+		return;
+	}
+
+	// 对于浏览量排序，需要等待 umamiCache 加载
+	if (mode === "views") {
+		const cards = container.querySelectorAll('[id^="post-card-"]');
+		const hasAnyViewData = Array.from(cards).some((card) => {
+			const slug = (card as HTMLElement).dataset.slug;
+			return (
+				slug && (window as any).umamiCache?.[slug]?.pageViews !== undefined
+			);
+		});
+
+		if (!hasAnyViewData && retries < maxRetries) {
+			// 浏览量数据未加载，继续等待
+			setTimeout(() => waitAndSort(mode, retries + 1), 200);
+			return;
+		}
+	}
+
+	// 条件满足，执行排序
+	sortPosts(mode);
+}
+
+onMount(() => {
+	// 显示跨页 toast
+	const pendingToast = sessionStorage.getItem("sort-toast");
+	if (pendingToast) {
+		sessionStorage.removeItem("sort-toast");
+		showToast(pendingToast);
+	}
+
+	// 初始判断并应用排序
+	applySavedSort();
+
+	// 监听 Swup 页面切换事件 - 使用多种事件确保触发
+	const handleSwupContentReplace = () => {
+		// 使用较长延迟确保 DOM 完全加载
+		setTimeout(() => {
+			applySavedSort();
+		}, 300);
+	};
+
+	// 尝试注册 Swup 钩子
+	const registerSwupHooks = () => {
+		if ((window as any).swup?.hooks) {
+			(window as any).swup.hooks.on(
+				"content:replace",
+				handleSwupContentReplace,
+			);
+			(window as any).swup.hooks.on("page:view", handleSwupContentReplace);
+		}
+	};
+
+	// 立即尝试注册
+	registerSwupHooks();
+
+	// 也监听 Swup 启用事件（以防 Swup 尚未初始化）
+	document.addEventListener("swup:enable", registerSwupHooks);
+	document.addEventListener("swup:contentReplaced", handleSwupContentReplace);
+
+	// 监听滚动显示返回顶部按钮
