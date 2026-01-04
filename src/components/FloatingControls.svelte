@@ -85,3 +85,90 @@ function showToast(message: string) {
 	setTimeout(() => toast.classList.add("show"), 10);
 	setTimeout(() => {
 		toast.classList.remove("show");
+		setTimeout(() => toast.remove(), 300);
+	}, 2000);
+}
+
+// 切换背景展示模式
+function toggleBackground() {
+	isBackgroundHidden = !isBackgroundHidden;
+	const mainContent = document.getElementById("main-content-wrapper");
+	const navbar = document.getElementById("navbar-wrapper");
+	const toc = document.getElementById("toc-wrapper");
+
+	if (isBackgroundHidden) {
+		if (mainContent) mainContent.style.display = "none";
+		if (navbar) navbar.style.display = "none";
+		if (toc) toc.style.display = "none";
+		document.body.style.overflow = "hidden";
+		showExitHint();
+	} else {
+		if (mainContent) mainContent.style.display = "";
+		if (navbar) navbar.style.display = "";
+		if (toc) toc.style.display = "";
+		document.body.style.overflow = "";
+		hideExitHint();
+	}
+}
+
+function showExitHint() {
+	const existingHint = document.getElementById("bg-exit-hint");
+	if (existingHint) return;
+
+	const hint = document.createElement("div");
+	hint.id = "bg-exit-hint";
+	hint.className = "bg-exit-hint";
+	hint.innerHTML = `
+            <div class="hint-content">
+                <div class="hint-icon">👆</div>
+                <div class="hint-text">点击按钮或按 ESC 键退出</div>
+            </div>
+        `;
+	document.body.appendChild(hint);
+	setTimeout(() => hint.classList.add("fade-out"), 3000);
+}
+
+function hideExitHint() {
+	const hint = document.getElementById("bg-exit-hint");
+	if (hint) hint.remove();
+}
+
+// 滚动到评论区
+function scrollToComments() {
+	const giscus = document.querySelector(".giscus");
+	if (giscus) {
+		giscus.scrollIntoView({ behavior: "smooth" });
+	}
+}
+
+// 返回顶部
+function backToTop() {
+	window.scroll({ top: 0, behavior: "smooth" });
+}
+
+// 应用保存的排序状态
+function applySavedSort() {
+	const currentPath = window.location.pathname;
+	const isCurrentHomePage =
+		currentPath === "/" || /^\/(\d+|page\/\d+)\/?$/.test(currentPath);
+	const isCurrentHotPage = /^\/hot(\/\d+)?\/?$/.test(currentPath);
+
+	if (isCurrentHomePage || isCurrentHotPage) {
+		isHomePage = true;
+		isHotPage = isCurrentHotPage;
+		isPostPage = false;
+
+		if (isCurrentHotPage) {
+			// /hot/ 页面默认选中 views
+			currentSortIndex = sortModes.findIndex((m) => m.key === "views");
+			localStorage.setItem("post-sort-mode", "views");
+		} else {
+			const savedSort = localStorage.getItem(
+				"post-sort-mode",
+			) as SortMode | null;
+			if (savedSort === "views") {
+				// 从 /hot/ 回到首页，重置为 published
+				currentSortIndex = 0;
+				localStorage.setItem("post-sort-mode", "published");
+			} else if (savedSort && savedSort !== "published") {
+				const savedIndex = sortModes.findIndex((m) => m.key === savedSort);
