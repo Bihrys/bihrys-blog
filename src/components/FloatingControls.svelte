@@ -259,3 +259,90 @@ onMount(() => {
 	document.addEventListener("swup:contentReplaced", handleSwupContentReplace);
 
 	// 监听滚动显示返回顶部按钮
+	const handleScroll = () => {
+		showBackToTop = window.scrollY > 300;
+	};
+	window.addEventListener("scroll", handleScroll, { passive: true });
+
+	// ESC 退出背景模式
+	const handleKeyDown = (e: KeyboardEvent) => {
+		if (e.key === "Escape" && isBackgroundHidden) {
+			toggleBackground();
+		}
+	};
+	window.addEventListener("keydown", handleKeyDown);
+
+	return () => {
+		window.removeEventListener("scroll", handleScroll);
+		window.removeEventListener("keydown", handleKeyDown);
+		document.removeEventListener("swup:enable", registerSwupHooks);
+		document.removeEventListener(
+			"swup:contentReplaced",
+			handleSwupContentReplace,
+		);
+		if ((window as any).swup?.hooks) {
+			(window as any).swup.hooks.off(
+				"content:replace",
+				handleSwupContentReplace,
+			);
+			(window as any).swup.hooks.off("page:view", handleSwupContentReplace);
+		}
+		hideExitHint();
+	};
+});
+</script>
+
+<div class="floating-controls" class:bg-mode={isBackgroundHidden}>
+  <!-- 排序按钮（仅首页） -->
+  {#if isHomePage && !isBackgroundHidden}
+    <button
+      class="control-btn"
+      on:click={cycleSortMode}
+      aria-label="切换排序方式"
+      title={`当前：${sortModes[currentSortIndex].label}（点击切换）`}
+    >
+      {#if sortModes[currentSortIndex].icon === "calendar"}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      {:else if sortModes[currentSortIndex].icon === "edit"}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <path d="M15 14l-3.5 3.5L10 16l3.5-3.5L15 14z"></path>
+          <line x1="12" y1="11" x2="12" y2="11.01"></line>
+        </svg>
+      {:else}
+        <!-- 火焰图标表示热门/浏览次数 -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
