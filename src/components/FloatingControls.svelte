@@ -346,3 +346,90 @@ onMount(() => {
           fill="none"
           stroke="currentColor"
           stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"
+          ></path>
+        </svg>
+      {/if}
+    </button>
+  {/if}
+
+  <!-- 预览背景按钮 -->
+  <button
+    class="control-btn"
+    class:active={isBackgroundHidden}
+    on:click={toggleBackground}
+    aria-label={isBackgroundHidden ? "显示内容" : "仅展示背景"}
+    title={isBackgroundHidden ? "显示内容" : "仅展示背景 (按ESC退出)"}
+  >
+    {#if isBackgroundHidden}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    {:else}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+        ></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    {/if}
+  </button>
+
+  <!-- 跳转评论区按钮（仅文章页） -->
+  {#if isPostPage && !isBackgroundHidden}
+    <button
+      class="control-btn"
+      on:click={scrollToComments}
+      aria-label="跳转到评论区"
+      title="跳转到评论区"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        <line x1="9" y1="10" x2="9" y2="10"></line>
+        <line x1="12" y1="10" x2="12" y2="10"></line>
+        <line x1="15" y1="10" x2="15" y2="10"></line>
+      </svg>
+    </button>
+  {/if}
+
+  <!-- 返回顶部按钮 -->
+  {#if !isBackgroundHidden}
+    <button
+      class="control-btn back-to-top"
+      class:show={showBackToTop}
+      on:click={backToTop}
