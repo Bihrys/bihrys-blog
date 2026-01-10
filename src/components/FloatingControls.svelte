@@ -433,3 +433,90 @@ onMount(() => {
       class="control-btn back-to-top"
       class:show={showBackToTop}
       on:click={backToTop}
+      aria-label="返回顶部"
+      title="返回顶部"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+  {/if}
+</div>
+
+<style>
+  .floating-controls {
+    position: fixed !important;
+    bottom: 6rem !important;
+    right: 1.5rem !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 9999;
+  }
+
+  /* 仅展示背景模式下仍固定在右下角，避免按钮跑到屏幕中央 */
+  .floating-controls.bg-mode {
+    bottom: 6rem !important;
+    right: 1.5rem !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+  }
+
+  .control-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--line-divider);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .control-btn:hover {
+    background: var(--btn-regular-bg-hover);
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary);
+  }
+
+  .control-btn:active {
+    transform: scale(0.95);
+  }
+
+  .control-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    animation: pulse 2s ease-in-out infinite;
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .control-btn.active:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+  }
