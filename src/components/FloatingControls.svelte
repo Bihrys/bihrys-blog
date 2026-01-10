@@ -520,3 +520,90 @@ onMount(() => {
     border-color: rgba(255, 255, 255, 0.5);
     transform: scale(1.1);
   }
+
+  .control-btn.back-to-top {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+  }
+
+  .control-btn.back-to-top.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+    }
+  }
+
+  /* 移动端 */
+  @media (max-width: 767px) {
+    .floating-controls {
+      right: 1rem !important;
+      bottom: 5rem !important;
+    }
+    .control-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.625rem;
+    }
+  }
+
+  /* Toast 样式 */
+  :global(.sort-toast) {
+    position: fixed;
+    top: 5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--card-bg);
+    color: var(--primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--line-divider);
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 10001;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  :global(.sort-toast.show) {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* 退出提示样式 */
+  :global(.bg-exit-hint) {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    pointer-events: none;
+    animation: slideDown 0.5s ease-out;
+  }
+
+  :global(.bg-exit-hint.fade-out) {
+    animation: fadeOut 0.5s ease-out forwards;
+  }
+
+  :global(.hint-content) {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
