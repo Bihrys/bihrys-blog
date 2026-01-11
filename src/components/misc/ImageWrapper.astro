@@ -85,3 +85,22 @@ const imageStyle = `object-position: ${position}`;
         transition: opacity 0.5s ease-out;
     }
     
+    @keyframes loading-progress {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(400%);
+        }
+    }
+    
+    .animate-loading-progress {
+        animation: loading-progress 1.5s ease-in-out infinite;
+    }
+    
+    .image-wrapper:hover .image-content {
+        transform: scale(1.05);
+        transition: transform 0.3s ease-out, opacity 0.5s ease-out;
+    }
+</style>
+
