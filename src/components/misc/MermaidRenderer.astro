@@ -172,3 +172,61 @@ const { prerenderAll = false } = Astro.props;
                 if (details.dataset.mermaidBound) return;
                 details.dataset.mermaidBound = '1';
                 details.addEventListener('toggle', function() {
+                    if (details.open) {
+                        var unrendered = details.querySelectorAll('pre[data-language="mermaid"]');
+                        if (unrendered.length > 0) {
+                            initMermaid();
+                        }
+                    }
+                });
+            });
+        }
+
+        // 主题切换监听
+        function setupThemeObserver() {
+            // 先清理旧的
+            cleanupResources();
+
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class' && mutation.target === document.documentElement) {
+                        // 确保 mermaid 已加载
+                        if (typeof mermaid === 'undefined') return;
+
+                        var isDark = document.documentElement.classList.contains('dark');
+                        mermaid.initialize({ theme: isDark ? 'dark' : 'default' });
+
+                        document.querySelectorAll('.mermaid[data-mermaid-src]').forEach(async function(container) {
+                            var code = container.getAttribute('data-mermaid-src');
+                            if (code) {
+                                try {
+                                    var result = await mermaid.render(container.id + '-rerender-' + Date.now(), code);
+                                    container.innerHTML = result.svg;
+                                } catch (e) {
+                                    console.error('[Mermaid] Re-render failed:', e);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.documentElement, { attributes: true });
+            resources.observer = observer;
+        }
+
+        // 初始化
+        initMermaid();
+        handleDetailsMermaid();
+        setupThemeObserver();
+
+        // Swup 兼容（只注册一次）
+        if (!window._mermaidSwupRegistered) {
+            document.addEventListener('swup:contentReplaced', function() {
+                initMermaid();
+                handleDetailsMermaid();
+                setupThemeObserver();
+            });
+            window._mermaidSwupRegistered = true;
+        }
+    })();
+</script>
