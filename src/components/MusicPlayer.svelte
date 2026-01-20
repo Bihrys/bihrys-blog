@@ -172,3 +172,90 @@ function handleCheckboxChange(event: Event) {
 <div class="container">
   <label>
     <input 
+      class="play-btn" 
+      type="checkbox"
+      aria-label="播放/暂停背景音乐"
+      bind:this={checkboxElement}
+      on:change={handleCheckboxChange}
+      disabled={isLoading}
+    >
+    <div class="play-icon"></div>
+    <div class="pause-icon"></div>
+  </label>
+</div>
+
+<!-- 优雅的音乐加载提示 -->
+{#if showLoadingToast}
+  <div class="music-loading-notification loading">
+    <div class="loading-content">
+      <div class="music-icon loading-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+      </div>
+      <div class="loading-wave">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+      <div class="loading-text">
+        <span class="main-text loading-main-text">🎵 音乐准备中</span>
+        <span class="sub-text">正在加载音频文件...</span>
+      </div>
+    </div>
+    <div class="loading-progress"></div>
+  </div>
+{/if}
+
+<!-- 音乐加载完成提示 -->
+{#if showLoadedToast}
+  <div class="music-loading-notification loaded">
+    <div class="loading-content">
+      <div class="music-icon success-icon">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <div class="success-animation">
+        <div class="ripple-1"></div>
+        <div class="ripple-2"></div>
+        <div class="ripple-3"></div>
+      </div>
+      <div class="loading-text">
+        <span class="main-text success-main-text">✨ 音乐已就绪</span>
+        <span class="sub-text">点击播放按钮开始播放</span>
+      </div>
+    </div>
+    <div class="success-glow"></div>
+  </div>
+{/if}
+
+<style>
+  .container {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    border-radius: 50%;
+    margin-right: 12px;
+  }
+
+  .play-btn {
+    position: absolute;
+    appearance: none;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary), var(--primary));
+    cursor: pointer;
+    outline: none;
+  }
+
+  .play-btn::before {
+    content: "";
+    position: absolute;
+    width: 93%;
+    height: 93%;
+    background-color: var(--card-bg);
+    border-radius: 50%;
+    left: 50%;
