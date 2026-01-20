@@ -85,3 +85,90 @@ onMount(() => {
 	return () => {
 		if (audio) {
 			audio.pause();
+			audio.src = "";
+		}
+		if (typeof window !== "undefined") {
+			window.removeEventListener("resize", updateIsMobile);
+		}
+	};
+});
+
+function loadAudioSource() {
+	if (currentSourceIndex < audioSources.length) {
+		isLoading = true;
+		showLoadingToast = true; // 显示加载提示
+		loadStartTime = Date.now(); // 记录开始时间
+		audio.src = audioSources[currentSourceIndex];
+		audio.load();
+		isInitialized = true;
+	}
+}
+
+function handleAudioError() {
+	console.warn(
+		`Failed to load audio source: ${audioSources[currentSourceIndex]}`,
+	);
+	currentSourceIndex++;
+	if (currentSourceIndex < audioSources.length) {
+		loadAudioSource();
+	} else {
+		console.error("All audio sources failed to load");
+		isLoading = false;
+		showLoadingToast = false;
+		showLoadedToast = false;
+		pendingPlayRequest = false;
+		// 所有音频源都加载失败时重置checkbox
+		if (checkboxElement) {
+			checkboxElement.checked = false;
+		}
+	}
+}
+
+function handleCheckboxChange(event: Event) {
+	const target = event.target as HTMLInputElement;
+
+	// 如果音频尚未初始化，先初始化
+	if (!isInitialized) {
+		loadAudioSource();
+
+		// 如果正在加载，移动端记下自动播放意图，桌面端阻止状态变化
+		if (isLoading) {
+			pendingPlayRequest = isMobile;
+			if (!isMobile) {
+				target.checked = false;
+			}
+			return;
+		}
+	}
+
+	if (!isLoaded) {
+		// 如果音频未加载完成，阻止checkbox状态改变
+		target.checked = false;
+		return;
+	}
+
+	// 如果显示加载完成提示，立即隐藏
+	if (showLoadedToast) {
+		showLoadedToast = false;
+	}
+
+	isPlaying = target.checked;
+
+	if (isPlaying) {
+		audio.play().catch((error) => {
+			console.error("Failed to play audio:", error);
+			// 播放失败时重置checkbox
+			if (checkboxElement) {
+				checkboxElement.checked = false;
+			}
+			isPlaying = false;
+		});
+	} else {
+		audio.pause();
+	}
+}
+</script>
+
+<div class="container">
+  <label>
+    <input 
