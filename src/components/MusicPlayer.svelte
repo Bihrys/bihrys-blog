@@ -259,3 +259,90 @@ function handleCheckboxChange(event: Event) {
     background-color: var(--card-bg);
     border-radius: 50%;
     left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .play-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .play-btn:checked {
+    animation: borderAnimate 700ms ease-in-out 1;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes borderAnimate {
+    0% {
+      transform: rotate(0);
+      background: conic-gradient(var(--primary), transparent 20%);
+    }
+
+    80% {
+      background: conic-gradient(var(--primary), transparent 90%);
+    }
+
+    100% {
+      transform: rotate(360deg);
+      background: conic-gradient(var(--primary), var(--primary));
+    }
+  }
+
+  .play-icon {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    left: 60%;
+    top: 50%;
+    background-color: var(--primary);
+    transform: translate(-60%, -50%) rotate(90deg);
+    clip-path: polygon(50% 15%, 0% 100%, 100% 100%);
+    transition: all 400ms ease-in-out;
+    cursor: pointer;
+  }
+
+  .play-btn:checked + .play-icon {
+    clip-path: polygon(0 100%, 0% 100%, 100% 100%);
+  }
+
+  .pause-icon {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+
+  .pause-icon::before {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 100%;
+    background-color: var(--primary);
+    left: 0;
+  }
+
+  .pause-icon::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 100%;
+    background-color: var(--primary);
+    right: 0;
+  }
+
+  .play-btn:checked ~ .pause-icon::before {
+    animation: reveal 300ms ease-in-out 350ms 1;
+    animation-fill-mode: forwards;
+  }
+
+  .play-btn:checked ~ .pause-icon::after {
+    animation: reveal 300ms ease-in-out 600ms 1;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes reveal {
+    0% {
