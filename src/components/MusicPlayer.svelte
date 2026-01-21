@@ -346,3 +346,90 @@ function handleCheckboxChange(event: Event) {
 
   @keyframes reveal {
     0% {
+      width: 0;
+    }
+
+    100% {
+      width: 35%;
+    }
+  }
+
+  /* 优雅的音乐加载提示样式 */
+  .music-loading-notification {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    background: var(--card-bg);
+    color: var(--primary);
+    padding: 0;
+    border-radius: var(--radius-large);
+    z-index: 10000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--btn-regular-bg);
+    overflow: hidden;
+    animation: musicNotificationSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 280px;
+    max-width: 320px;
+  }
+
+  .loading-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px 12px 20px;
+  }
+
+  .music-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: white;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .loading-icon {
+    background: linear-gradient(135deg, var(--primary), oklch(0.8 0.12 var(--hue)));
+    animation: musicPulse 2s ease-in-out infinite;
+  }
+
+  .success-icon {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    animation: successBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .loading-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 20px;
+  }
+
+  .wave-bar {
+    width: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+    animation: musicWave 1.2s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { animation-delay: 0s; }
+  .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+  .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+  .wave-bar:nth-child(4) { animation-delay: 0.6s; }
+
+  .loading-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .main-text {
+    font-size: 15px;
