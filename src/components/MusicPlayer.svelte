@@ -433,3 +433,90 @@ function handleCheckboxChange(event: Event) {
 
   .main-text {
     font-size: 15px;
+    font-weight: 600;
+    color: var(--deep-text);
+  }
+
+  .loading-main-text {
+    background: linear-gradient(135deg, var(--primary), oklch(0.8 0.12 var(--hue)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    animation: textPulse 2s ease-in-out infinite;
+  }
+
+  .success-main-text {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+
+  .sub-text {
+    font-size: 12px;
+    color: var(--btn-content);
+    opacity: 0.8;
+  }
+
+  .loading-progress {
+    height: 3px;
+    background: var(--btn-regular-bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .loading-progress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    animation: progressSlide 1.5s ease-in-out infinite;
+  }
+
+  .success-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    position: relative;
+  }
+
+  .ripple-1, .ripple-2, .ripple-3 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid #22c55e;
+    border-radius: 50%;
+    opacity: 0;
+    animation: rippleEffect 1.5s ease-out infinite;
+  }
+
+  .ripple-2 {
+    animation-delay: 0.3s;
+  }
+
+  .ripple-3 {
+    animation-delay: 0.6s;
+  }
+
+  .success-glow {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #22c55e, transparent);
+    position: relative;
+    overflow: hidden;
+    opacity: 0.8;
+  }
+
+  .success-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
