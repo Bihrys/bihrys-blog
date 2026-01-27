@@ -520,3 +520,90 @@ function handleCheckboxChange(event: Event) {
     left: -100%;
     width: 100%;
     height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.8), transparent);
+    animation: successGlow 0.8s ease-out;
+  }
+
+  @keyframes musicNotificationSlideUp {
+    from {
+      transform: translateY(100%) scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes musicPulse {
+    0%, 100% { 
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(var(--primary-rgb, 112, 78, 199), 0.4);
+    }
+    50% { 
+      transform: scale(1.05);
+      box-shadow: 0 0 0 8px rgba(var(--primary-rgb, 112, 78, 199), 0);
+    }
+  }
+
+  @keyframes musicWave {
+    0%, 40%, 100% { 
+      height: 8px; 
+      opacity: 0.6;
+    }
+    20% { 
+      height: 20px; 
+      opacity: 1;
+    }
+  }
+
+  @keyframes progressSlide {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
+  @keyframes textPulse {
+    0%, 100% { 
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% { 
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes successBounce {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes rippleEffect {
+    0% {
+      transform: scale(0.8);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+
+  @keyframes successGlow {
+    0% {
