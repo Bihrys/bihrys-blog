@@ -607,3 +607,78 @@ function handleCheckboxChange(event: Event) {
 
   @keyframes successGlow {
     0% {
+      left: -100%;
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .container {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .play-icon,
+    .pause-icon {
+      width: 11px;
+      height: 11px;
+    }
+
+    /* 移动端：通知底部居中，避免与汉堡面板重叠或被裁剪 */
+    .music-loading-notification {
+      position: fixed;
+      top: auto;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      width: min(520px, calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 28px));
+      min-width: 0;
+      max-width: 100%;
+      margin: 0;
+      z-index: 11000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+      border-radius: var(--radius-large);
+    }
+
+    /* 移动端取消弹窗通知显示 */
+    .music-loading-notification {
+      display: none;
+    }
+
+    .loading-content {
+      padding: 12px 14px 10px 14px;
+      gap: 10px;
+    }
+
+    .music-icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .music-icon svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .loading-wave {
+      display: none;
+    }
+
+    .main-text {
+      font-size: 13px;
+    }
+
+    .sub-text {
+      font-size: 10px;
+    }
+  }
+</style>
