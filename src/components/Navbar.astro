@@ -172,3 +172,84 @@ function loadButtonScript() {
             document.querySelectorAll('.nav-dropdown.is-open').forEach(d => {
                 if (d !== dropdown) {
                     d.classList.remove('is-open');
+                    d.querySelector('.nav-dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+                }
+            });
+            dropdown.classList.toggle('is-open', willOpen);
+            btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+    });
+}
+
+loadButtonScript();
+
+// 监听面板 class 变化，同步汉堡按钮的展开状态（覆盖 Layout.astro 的 setClickOutsideToClose 等外部关闭来源）
+if (!window.__navMenuObserverBound) {
+    const navMenuPanel = document.getElementById("nav-menu-panel");
+    const navMenuBtn = document.getElementById("nav-menu-switch");
+    if (navMenuPanel && navMenuBtn) {
+        window.__navMenuObserverBound = true;
+        const syncMenuBtn = () => {
+            const isOpen = !navMenuPanel.classList.contains("float-panel-closed");
+            navMenuBtn.classList.toggle("is-open", isOpen);
+            navMenuBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        };
+        new MutationObserver(syncMenuBtn).observe(navMenuPanel, { attributes: true, attributeFilter: ["class"] });
+        syncMenuBtn();
+    }
+}
+
+if (!window.__navDropdownOutsideBound) {
+    window.__navDropdownOutsideBound = true;
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element) || !target.closest('.nav-dropdown')) {
+            document.querySelectorAll('.nav-dropdown.is-open').forEach(d => {
+                d.classList.remove('is-open');
+                d.querySelector('.nav-dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.nav-dropdown.is-open').forEach(d => {
+                d.classList.remove('is-open');
+                d.querySelector('.nav-dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+}
+
+// 监听 Swup 页面跳转事件，重新绑定事件
+document.addEventListener("swup:contentReplaced", loadButtonScript);
+</script>
+
+<style>
+.nav-dropdown-content { display: none; }
+.nav-dropdown.is-open .nav-dropdown-content { display: block; }
+.nav-dropdown.is-open .nav-dropdown-arrow { transform: rotate(180deg); }
+
+.menu-toggle-btn .menu-icon-hamburger,
+.menu-toggle-btn .menu-icon-close {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transition: opacity 200ms ease, transform 200ms ease;
+}
+.menu-toggle-btn .menu-icon-hamburger {
+    transform: translate(-50%, -50%) rotate(0);
+    opacity: 1;
+}
+.menu-toggle-btn .menu-icon-close {
+    transform: translate(-50%, -50%) rotate(-90deg);
+    opacity: 0;
+}
+.menu-toggle-btn.is-open .menu-icon-hamburger {
+    transform: translate(-50%, -50%) rotate(90deg);
+    opacity: 0;
+}
+.menu-toggle-btn.is-open .menu-icon-close {
+    transform: translate(-50%, -50%) rotate(0);
+    opacity: 1;
+}
+</style>
