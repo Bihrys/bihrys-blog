@@ -85,3 +85,90 @@ const navItems: NavItem[] = navBarConfig.links.map((item) => {
                         >
                             <div class="flex items-center gap-1 whitespace-nowrap">
                                 {item.name}
+                                {item.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.75rem] opacity-50" />}
+                            </div>
+                        </a>
+                    );
+                })}
+            </div>
+            <!-- Spacer for non-xl screens -->
+            <div class="flex-grow lg:hidden"></div>
+
+            <!-- Right Controls: Music, Search, Settings, Menu -->
+            <div class="flex items-center gap-1">
+                <!-- 音乐播放器：桌面端显示在导航栏，移动端在汉堡菜单中 -->
+                <div class="hidden md:block origin-right" style="transform: none;">
+                    <MusicPlayer client:only="svelte"></MusicPlayer>
+                </div>
+                
+                <Search client:only="svelte"></Search>
+
+                <RandomBgToggle client:only="svelte" />
+
+                {!siteConfig.themeColor.fixed && (
+                        <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch">
+                            <Icon name="material-symbols:palette-outline" class="text-[1.25rem]"></Icon>
+                        </button>
+                )}
+
+                <button aria-label="Menu" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 lg:!hidden relative menu-toggle-btn" id="nav-menu-switch" aria-expanded="false">
+                    <Icon name="material-symbols:menu-rounded" class="text-[1.25rem] menu-icon-hamburger"></Icon>
+                    <Icon name="material-symbols:close-rounded" class="text-[1.25rem] menu-icon-close"></Icon>
+                </button>
+            </div>
+            
+            <NavMenuPanel navItems={navItems}></NavMenuPanel>
+            <DisplaySettings client:only="svelte"></DisplaySettings>
+        </div>
+</div>
+
+<script>
+function loadButtonScript() {
+
+    let settingBtn = document.getElementById("display-settings-switch");
+    if (settingBtn) {
+        settingBtn.onclick = function () {
+            let settingPanel = document.getElementById("display-setting");
+            if (settingPanel) {
+                settingPanel.classList.toggle("float-panel-closed");
+            }
+        };
+    }
+
+    let menuBtn = document.getElementById("nav-menu-switch");
+    if (menuBtn) {
+        menuBtn.onclick = function () {
+            let menuPanel = document.getElementById("nav-menu-panel");
+            if (menuPanel) {
+                menuPanel.classList.toggle("float-panel-closed");
+                const isOpen = !menuPanel.classList.contains("float-panel-closed");
+                menuBtn.classList.toggle("is-open", isOpen);
+                menuBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+            }
+        };
+    }
+
+    document.querySelectorAll('.nav-group-toggle').forEach(btn => {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = 'true';
+        btn.addEventListener('click', () => {
+            const children = btn.closest('.nav-group')?.querySelector('.nav-group-children');
+            const arrow = btn.querySelector('.nav-group-arrow');
+            if (!children) return;
+            children.classList.toggle('max-h-0');
+            children.classList.toggle('max-h-40');
+            arrow?.classList.toggle('rotate-180');
+        });
+    });
+
+    document.querySelectorAll('.nav-dropdown-toggle').forEach(btn => {
+        if (btn.dataset.boundDropdown) return;
+        btn.dataset.boundDropdown = 'true';
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = btn.closest('.nav-dropdown');
+            if (!dropdown) return;
+            const willOpen = !dropdown.classList.contains('is-open');
+            document.querySelectorAll('.nav-dropdown.is-open').forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('is-open');
