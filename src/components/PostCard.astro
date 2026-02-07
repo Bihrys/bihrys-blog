@@ -259,3 +259,16 @@ const { remarkPluginFrontmatter } = await entry.render();
             observer.observe(card);
         }
         
+        // 初始化 3D 效果
+        initTiltEffect();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPostCardStats);
+    } else {
+        initPostCardStats();
+    }
+</script>
+
+<style define:vars={{coverWidth}}>
+</style>
