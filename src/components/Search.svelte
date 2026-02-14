@@ -85,3 +85,90 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
 					meta: {
 						title: post.title,
 					},
+					excerpt: highlightText(excerpt, keyword),
+					urlPath: `/posts/${post.link}`,
+				};
+			});
+
+		result = searchResults;
+		setPanelVisibility(result.length > 0, isDesktop);
+	} catch (error) {
+		console.error("Search error:", error);
+		result = [];
+		setPanelVisibility(false, isDesktop);
+	} finally {
+		isSearching = false;
+	}
+};
+
+onMount(async () => {
+	try {
+		const response = await fetch("/rss.xml");
+		const text = await response.text();
+		const parser = new DOMParser();
+		const xml = parser.parseFromString(text, "text/xml");
+		const items = xml.querySelectorAll("item");
+
+		posts = Array.from(items).map((item) => {
+			// 尝试多种方式获取content:encoded内容
+			let content = "";
+			const contentEncoded =
+				item.getElementsByTagNameNS("*", "encoded")[0]?.textContent ||
+				item.querySelector("*|encoded")?.textContent ||
+				"";
+
+			if (contentEncoded) {
+				content = contentEncoded.replace(/<[^>]*>/g, "");
+			}
+
+			return {
+				title: item.querySelector("title")?.textContent || "",
+				description: item.querySelector("description")?.textContent || "",
+				content: content,
+				link:
+					item
+						.querySelector("link")
+						?.textContent?.replace(/.*\/posts\/(.*?)\//, "$1") || "",
+			};
+		});
+	} catch (error) {
+		console.error("Error fetching RSS:", error);
+	}
+});
+
+$: search(keywordDesktop, true);
+$: search(keywordMobile, false);
+</script>
+
+<!-- search bar for desktop view -->
+<div id="search-bar" class="hidden lg:flex transition-all items-center h-11 mr-2 rounded-lg
+      bg-black/[0.04] hover:bg-black/[0.06] focus-within:bg-black/[0.06]
+      dark:bg-white/5 dark:hover:bg-white/10 dark:focus-within:bg-white/10
+">
+    <Icon icon="material-symbols:search" class="absolute text-[1.25rem] pointer-events-none ml-3 transition my-auto text-black/30 dark:text-white/30"></Icon>
+    <input placeholder="搜索" bind:value={keywordDesktop} on:focus={() => search(keywordDesktop, true)}
+           class="transition-all pl-10 text-sm bg-transparent outline-0
+         h-full w-40 focus:w-52 text-black/50 dark:text-white/50"
+    >
+</div>
+
+<!-- toggle btn for phone/tablet view -->
+<button on:click={togglePanel} aria-label="Search Panel" id="search-switch"
+        class="btn-plain scale-animation lg:!hidden rounded-lg w-11 h-11 active:scale-90">
+    <Icon icon="material-symbols:search" class="text-[1.25rem]"></Icon>
+</button>
+
+<!-- search panel -->
+<div id="search-panel" class="float-panel float-panel-closed search-panel absolute md:w-[30rem]
+top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
+
+    <!-- search bar inside panel for phone/tablet -->
+    <div id="search-bar-inside" class="flex relative lg:hidden transition-all items-center h-11 rounded-xl
+      bg-black/[0.04] hover:bg-black/[0.06] focus-within:bg-black/[0.06]
+      dark:bg-white/5 dark:hover:bg-white/10 dark:focus-within:bg-white/10
+  ">
+        <Icon icon="material-symbols:search" class="absolute text-[1.25rem] pointer-events-none ml-3 transition my-auto text-black/30 dark:text-white/30"></Icon>
+        <input placeholder="Search" bind:value={keywordMobile}
+               class="pl-10 absolute inset-0 text-sm bg-transparent outline-0
+               focus:w-60 text-black/50 dark:text-white/50"
+        >
