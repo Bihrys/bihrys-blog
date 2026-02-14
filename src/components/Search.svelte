@@ -172,3 +172,32 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
                class="pl-10 absolute inset-0 text-sm bg-transparent outline-0
                focus:w-60 text-black/50 dark:text-white/50"
         >
+    </div>
+
+    <!-- search results -->
+    {#each result as item}
+        <a href={item.url}
+           class="transition first-of-type:mt-2 lg:first-of-type:mt-0 group block
+       rounded-xl text-lg px-3 py-2 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)]">
+            <div class="transition text-90 inline-flex font-bold group-hover:text-[var(--primary)]">
+                {item.meta.title}<Icon icon="fa6-solid:chevron-right" class="transition text-[0.75rem] translate-x-1 my-auto text-[var(--primary)]"></Icon>
+            </div>
+            <div class="transition text-xs text-white mb-1 font-mono">
+                {item.urlPath}
+            </div>
+            <div class="transition text-sm text-50">
+                {@html item.excerpt}
+            </div>
+        </a>
+    {/each}
+</div>
+
+<style>
+  input:focus {
+    outline: 0;
+  }
+  .search-panel {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+</style>
