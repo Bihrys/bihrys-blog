@@ -85,3 +85,7 @@ $: if (hue || hue === 0) {
           box-shadow none
           &:hover
             background rgba(255, 255, 255, 0.8)
+          &:active
+            background rgba(255, 255, 255, 0.6)
+
+</style>
