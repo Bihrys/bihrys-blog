@@ -85,3 +85,90 @@ const githubProfileUrl = `https://github.com/${data.username}`;
         </div>
         <button
             type="button"
+            class="gh-contrib-palette-btn btn-plain scale-animation rounded-lg h-8 w-8 shrink-0"
+            aria-label="切换到 GitHub 配色"
+            title="切换到 GitHub 配色"
+        >
+            <Icon name="material-symbols:palette-outline" class="text-[1.1rem]" />
+        </button>
+    </div>
+
+    <div class="flex items-start">
+        <!-- 星期标签列：不参与横向滚动，与网格用 flex 并排 -->
+        <div class="grid grid-rows-[repeat(7,10px)] gap-[3px] shrink-0 pr-2 mt-[17px] text-[10px] leading-[10px] text-30">
+            {WEEKDAY_LABELS.map((label) => <div class="h-[10px]">{label}</div>)}
+        </div>
+
+        <div class="gh-contrib-scroll min-w-0 flex-1 overflow-x-auto hide-scrollbar">
+            <div>
+                <!-- 月份标签行：绝对定位到对应列的起始像素，随下方网格一起横向滚动 -->
+                <div class="relative h-[14px] mb-[3px] text-[10px] text-30" style={`width:${totalColumns * CELL_STEP}px`}>
+                    {monthLabels.map((m) => (
+                        <span class="absolute top-0 whitespace-nowrap" style={`left:${m.column * CELL_STEP}px`}>{m.label}</span>
+                    ))}
+                </div>
+
+                <div class="grid grid-flow-col grid-rows-[repeat(7,10px)] gap-[3px]">
+                    {Array.from({ length: leadingBlanks }).map(() => <div class="w-[10px] h-[10px]"></div>)}
+                    {data.days.map((day) => (
+                        <div
+                            class="gh-contrib-cell w-[10px] h-[10px] rounded-[2px]"
+                            data-level={day.level}
+                            title={tooltipOf(day.date, day.count)}
+                        ></div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-1 mt-3 text-[10px] text-30">
+        <span>Less</span>
+        {[0, 1, 2, 3, 4].map((level) => (
+            <span class="gh-contrib-legend inline-block w-[10px] h-[10px] rounded-[2px]" data-level={level}></span>
+        ))}
+        <span>More</span>
+    </div>
+</div>
+
+<style>
+    /* 站点始终使用暗色，这里只维护暗色一套取值，不做明暗分支 */
+
+    /* 主题跟随色：跟随站点主色相（--hue） */
+    .gh-contrib {
+        --ghc-l0: oklch(0.28 0.015 var(--hue));
+        --ghc-l1: oklch(0.36 0.05 var(--hue));
+        --ghc-l2: oklch(0.46 0.09 var(--hue));
+        --ghc-l3: oklch(0.58 0.13 var(--hue));
+        --ghc-l4: oklch(0.70 0.17 var(--hue));
+    }
+
+    /* GitHub 原版配色（暗色版） */
+    .gh-contrib[data-palette="github"] {
+        --ghc-l0: #161b22;
+        --ghc-l1: #0e4429;
+        --ghc-l2: #006d32;
+        --ghc-l3: #26a641;
+        --ghc-l4: #39d353;
+    }
+
+    .gh-contrib-cell,
+    .gh-contrib-legend {
+        background-color: var(--ghc-l0);
+    }
+    .gh-contrib-cell[data-level="1"],
+    .gh-contrib-legend[data-level="1"] {
+        background-color: var(--ghc-l1);
+    }
+    .gh-contrib-cell[data-level="2"],
+    .gh-contrib-legend[data-level="2"] {
+        background-color: var(--ghc-l2);
+    }
+    .gh-contrib-cell[data-level="3"],
+    .gh-contrib-legend[data-level="3"] {
+        background-color: var(--ghc-l3);
+    }
+    .gh-contrib-cell[data-level="4"],
+    .gh-contrib-legend[data-level="4"] {
+        background-color: var(--ghc-l4);
+    }
