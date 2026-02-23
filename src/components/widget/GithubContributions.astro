@@ -1,0 +1,87 @@
+---
+import type { ContributionData } from "@utils/github-contributions";
+// GitHub 贡献热力图组件：纯展示，数据由调用方（Footer）通过 props 传入。
+import { Icon } from "astro-icon/components";
+
+interface Props {
+	data: ContributionData;
+	class?: string;
+}
+
+const { data } = Astro.props;
+const className = Astro.props.class;
+
+const CELL_SIZE = 10;
+const CELL_GAP = 3;
+const CELL_STEP = CELL_SIZE + CELL_GAP;
+const WEEK_DAYS = 7;
+// 只在周一/周三/周五显示星期标签，与 GitHub 一致
+const WEEKDAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+const MONTH_NAMES = [
+	"Jan",
+	"Feb",
+	"Mar",
+	"Apr",
+	"May",
+	"Jun",
+	"Jul",
+	"Aug",
+	"Sep",
+	"Oct",
+	"Nov",
+	"Dec",
+];
+
+// days[0] 未必是周日，网格开头需要补 leadingBlanks 个空占位格才能按周对齐。
+// 日期一律按 UTC 解析，避免跨时区导致整体偏移一天。
+const firstDay = data.days[0];
+const leadingBlanks = firstDay
+	? new Date(`${firstDay.date}T00:00:00Z`).getUTCDay()
+	: 0;
+const totalColumns = Math.ceil((leadingBlanks + data.days.length) / WEEK_DAYS);
+
+// 遍历 days，找出每个月份第一次出现所在的列索引，用于渲染月份标签。
+// 相邻月份标签间隔太近（同列或相邻列）时跳过，避免重叠。
+interface MonthLabel {
+	label: string;
+	column: number;
+}
+const monthLabels: MonthLabel[] = [];
+let lastMonth = -1;
+let lastLabelColumn = Number.NEGATIVE_INFINITY;
+// 数据起始日通常落在某月中旬（如 7/27），这个残缺首月只占一两列。
+// 若为它标注月份，紧随其后的完整月份会因间距不足被跳过（Aug 丢失），与 GitHub 的显示不符。
+const startsMidMonth = firstDay
+	? new Date(`${firstDay.date}T00:00:00Z`).getUTCDate() !== 1
+	: false;
+data.days.forEach((day, index) => {
+	const month = new Date(`${day.date}T00:00:00Z`).getUTCMonth();
+	if (month === lastMonth) return;
+	lastMonth = month;
+	if (index === 0 && startsMidMonth) return;
+	const column = Math.floor((leadingBlanks + index) / WEEK_DAYS);
+	if (column - lastLabelColumn < 2) return;
+	lastLabelColumn = column;
+	monthLabels.push({ label: MONTH_NAMES[month] ?? "", column });
+});
+
+function tooltipOf(date: string, count: number): string {
+	return `${date}：${count > 0 ? `${count} 次贡献` : "无贡献"}`;
+}
+
+// 展示名优先用 GitHub 上设置的 name，未设置时回退为用户名
+const displayName = data.name || data.username;
+const githubProfileUrl = `https://github.com/${data.username}`;
+---
+<div class:list={["gh-contrib card-base p-4 sm:p-5", className]} data-palette="theme">
+    <div class="flex items-center gap-3 mb-4">
+        <a href={githubProfileUrl} target="_blank" rel="noopener"
+           class="shrink-0 rounded-full overflow-hidden w-10 h-10 ring-1 ring-[var(--line-divider)] transition hover:ring-[var(--primary)]">
+            <img src={data.avatarUrl} alt={`${displayName} 的 GitHub 头像`} width="40" height="40" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+        </a>
+        <div class="min-w-0 flex-1">
+            <a href={githubProfileUrl} target="_blank" rel="noopener" class="font-bold text-sm text-90 hover:text-[var(--primary)] transition truncate block">{displayName}</a>
+            <div class="text-xs text-30">过去一年共 <span class="text-[var(--primary)] font-medium">{data.total.toLocaleString()}</span> 次贡献</div>
+        </div>
+        <button
+            type="button"
