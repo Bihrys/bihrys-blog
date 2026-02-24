@@ -172,3 +172,54 @@ const githubProfileUrl = `https://github.com/${data.username}`;
     .gh-contrib-legend[data-level="4"] {
         background-color: var(--ghc-l4);
     }
+</style>
+
+<script is:inline>
+(function () {
+    var PALETTE_KEY = "gh-contrib-palette";
+
+    function updateButtonLabels(palette) {
+        var label = palette === "github" ? "切换到主题配色" : "切换到 GitHub 配色";
+        document.querySelectorAll(".gh-contrib-palette-btn").forEach(function (btn) {
+            btn.setAttribute("aria-label", label);
+            btn.setAttribute("title", label);
+        });
+    }
+
+    // Footer 在 DOM 里同时存在两份（lg+ 一份、<lg 一份，靠 CSS 控制可见性），
+    // 必须遍历所有 .gh-contrib 实例逐个处理，不能用 getElementById 只处理第一份。
+    function initGhContrib() {
+        var palette = localStorage.getItem(PALETTE_KEY) === "github" ? "github" : "theme";
+        document.querySelectorAll(".gh-contrib").forEach(function (el) {
+            el.dataset.palette = palette;
+
+            // Swup 每次导航后都要重新把滚动条定位到最新日期（最右侧）
+            var scroller = el.querySelector(".gh-contrib-scroll");
+            if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+
+            var btn = el.querySelector(".gh-contrib-palette-btn");
+            if (!btn || btn.dataset.bound) return;
+            btn.dataset.bound = "true";
+            btn.addEventListener("click", function () {
+                var next = el.dataset.palette === "github" ? "theme" : "github";
+                localStorage.setItem(PALETTE_KEY, next);
+                document.querySelectorAll(".gh-contrib").forEach(function (instance) {
+                    instance.dataset.palette = next;
+                });
+                updateButtonLabels(next);
+            });
+        });
+        updateButtonLabels(palette);
+    }
+
+    initGhContrib();
+
+    // 本组件会随 Footer 渲染两份，脚本可能执行多次；用全局标记防止重复注册监听器。
+    // Swup 只替换 <main>，<lg 那份 Footer 在 main 外不会被替换，其脚本不会重跑，
+    // 所以要靠 swup:contentReplaced 事件 + initGhContrib() 重新处理新插入的实例。
+    if (!window.__ghContribListenerBound) {
+        window.__ghContribListenerBound = true;
+        document.addEventListener("swup:contentReplaced", initGhContrib);
+    }
+})();
+</script>
