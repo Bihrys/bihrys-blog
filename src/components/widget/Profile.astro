@@ -85,3 +85,90 @@ const config = profileConfig;
                             <span class="text-[10px] text-neutral-400">UV</span>
                         </div>
                     </div>
+                    <!-- 装饰背景 -->
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-[var(--primary)] opacity-5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* 数字加载动画 */
+    .stats-number {
+        min-width: 2.5rem;
+        display: inline-block;
+        font-feature-settings: "tnum";
+    }
+    
+    @keyframes countUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .stats-loaded {
+        animation: countUp 0.4s ease-out forwards;
+    }
+    
+    /* 骨架屏闪烁效果 */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+    
+    .stats-number:not(.stats-loaded) {
+        background: linear-gradient(90deg, 
+            var(--btn-content) 25%, 
+            var(--card-bg) 50%, 
+            var(--btn-content) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        opacity: 0.5;
+    }
+</style>
+
+<script define:vars={{ umamiConfig }}>
+    // 数字滚动动画效果
+    function animateNumber(element, targetValue, duration = 1000) {
+        const startValue = 0;
+        const startTime = performance.now();
+        
+        function easeOutQuart(t) {
+            return 1 - Math.pow(1 - t, 4);
+        }
+        
+        function formatNumber(num) {
+            if (num >= 10000) return (num / 10000).toFixed(1) + 'w';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            return num.toLocaleString();
+        }
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easedProgress = easeOutQuart(progress);
+            const currentValue = Math.floor(startValue + (targetValue - startValue) * easedProgress);
+            
+            element.textContent = formatNumber(currentValue);
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            } else {
+                element.textContent = formatNumber(targetValue);
+                element.classList.add('stats-loaded');
+            }
+        }
+        
