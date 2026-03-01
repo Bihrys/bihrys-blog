@@ -172,3 +172,73 @@ const config = profileConfig;
             }
         }
         
+        requestAnimationFrame(update);
+    }
+    
+    // 获取全站访问量统计
+    async function loadSiteStats() {
+        if (!umamiConfig.enable) {
+            return;
+        }
+        
+        try {
+            // 调用全局工具获取 Umami 分享数据
+            const { websiteId, token } = await getUmamiShareData(umamiConfig.baseUrl, umamiConfig.shareId);
+            
+            // 第二步：获取全站统计数据（不指定url参数获取全站数据）
+            const currentTimestamp = Date.now();
+            const statsUrl = `${umamiConfig.baseUrl}/api/websites/${websiteId}/stats?startAt=0&endAt=${currentTimestamp}&unit=hour&timezone=${encodeURIComponent(umamiConfig.timezone)}`;
+            
+            const statsResponse = await fetch(statsUrl, {
+                headers: {
+                    'x-umami-share-token': token,
+                    'x-umami-share-context': 'true'
+                }
+            });
+
+            if (statsResponse.status === 401) {
+                // token 失效，清理缓存后重新获取一次
+                clearUmamiShareCache();
+                return await loadSiteStats();
+            }
+            
+            if (!statsResponse.ok) {
+                throw new Error('获取统计数据失败');
+            }
+            
+            const statsData = await statsResponse.json();
+            const pageviews = statsData.pageviews || 0;
+            const visitors = statsData.visitors || 0;  // 修复: 使用 visitors (独立访客) 而非 visits (会话数)
+            
+            const pageviewsElement = document.getElementById('site-pageviews');
+            const visitorsElement = document.getElementById('site-visitors');
+            
+            // 使用数字滚动动画
+            if (pageviewsElement) {
+                animateNumber(pageviewsElement, pageviews, 1200);
+            }
+            if (visitorsElement) {
+                // 稍微延迟第二个数字的动画，产生错落感
+                setTimeout(() => {
+                    animateNumber(visitorsElement, visitors, 1000);
+                }, 150);
+            }
+        } catch (error) {
+            console.error('获取全站统计失败:', error);
+            const pageviewsElement = document.getElementById('site-pageviews');
+            const visitorsElement = document.getElementById('site-visitors');
+            if (pageviewsElement) {
+                pageviewsElement.textContent = '-';
+                pageviewsElement.classList.add('stats-loaded');
+            }
+            if (visitorsElement) {
+                visitorsElement.textContent = '-';
+                visitorsElement.classList.add('stats-loaded');
+            }
+        }
+    }
+
+    // 页面加载完成后获取统计数据
+    document.addEventListener('DOMContentLoaded', loadSiteStats);
+</script>
+
