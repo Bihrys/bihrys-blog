@@ -172,3 +172,90 @@ class TableOfContents extends HTMLElement {
                 || (offsetTop < 0 && offsetBottom > window.innerHeight)) {                    
                 this.markActiveHeading(i);
             }
+            else if (offsetTop > window.innerHeight) break;
+        }
+    };
+
+    markActiveHeading = (idx: number)=> {
+        this.active[idx] = true;
+    };
+
+    handleAnchorClick = (event: Event) => {
+        const anchor = event
+            .composedPath()
+            .find((element) => element instanceof HTMLAnchorElement);
+
+        if (anchor) {
+            const id = decodeURIComponent(anchor.hash?.substring(1));
+            const idx = this.headingIdxMap.get(id);
+            if (idx !== undefined) {
+                this.anchorNavTarget = this.headings[idx];
+            } else {
+                this.anchorNavTarget = null;
+            }
+        }
+    };
+
+    isInRange(value: number, min: number, max: number) {
+        return min < value && value < max;
+    };
+
+    connectedCallback() {
+        // wait for the onload animation to finish, which makes the `getBoundingClientRect` return correct values
+        const element = document.querySelector('.prose');
+        if (element) {
+            element.addEventListener('animationend', () => {
+                this.init();
+            }, { once: true });
+        } else {
+            console.debug('Animation element not found');
+        }
+    };
+
+    init() {
+        this.tocEl = document.getElementById(
+            "toc-inner-wrapper"
+        );
+
+        if (!this.tocEl) return;
+
+        this.tocEl.addEventListener("click", this.handleAnchorClick, {
+            capture: true,
+        });
+
+        this.activeIndicator = document.getElementById("active-indicator");
+
+        this.tocEntries = Array.from(
+            document.querySelectorAll<HTMLAnchorElement>("#toc a[href^='#']")
+        );
+
+        if (this.tocEntries.length === 0) return;
+
+        this.sections = new Array(this.tocEntries.length);
+        this.headings = new Array(this.tocEntries.length);
+        for (let i = 0; i < this.tocEntries.length; i++) {
+            const id = decodeURIComponent(this.tocEntries[i].hash?.substring(1));
+            const heading = document.getElementById(id);
+            const section = heading?.parentElement;
+            if (heading instanceof HTMLElement && section instanceof HTMLElement) {
+                this.headings[i] = heading;
+                this.sections[i] = section;
+                this.headingIdxMap.set(id, i);
+            }
+        }
+        this.active = new Array(this.tocEntries.length).fill(false);
+
+        this.sections.forEach((section) =>
+            this.observer.observe(section)
+        );
+
+        this.fallback();
+        this.update();
+    };
+
+    disconnectedCallback() {
+        this.sections.forEach((section) =>
+            this.observer.unobserve(section)
+        );
+        this.observer.disconnect();
+        this.tocEl?.removeEventListener("click", this.handleAnchorClick);
