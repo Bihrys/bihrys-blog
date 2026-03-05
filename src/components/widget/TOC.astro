@@ -259,3 +259,10 @@ class TableOfContents extends HTMLElement {
         );
         this.observer.disconnect();
         this.tocEl?.removeEventListener("click", this.handleAnchorClick);
+    };
+}
+
+if (!customElements.get("table-of-contents")) {
+    customElements.define("table-of-contents", TableOfContents);
+}
+</script>
