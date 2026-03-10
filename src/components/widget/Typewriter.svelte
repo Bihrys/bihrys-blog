@@ -85,3 +85,5 @@ onDestroy(() => {
     color: var(--primary);
     transition: opacity 0.1s;
     line-height: 1; /* Ensure height matches text */
+  }
+</style>
