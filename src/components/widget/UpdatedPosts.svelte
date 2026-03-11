@@ -85,3 +85,48 @@ $effect(() => {
           : 'bg-transparent border-transparent text-neutral-500 hover:bg-[var(--btn-plain-bg-hover)] hover:text-[var(--primary)]'}"
         onclick={() => (daysRange = range)}
       >
+        {range}天
+      </button>
+    {/each}
+  </div>
+
+  <!-- Posts list -->
+  <div
+    class="flex flex-col gap-2 max-h-[300px] overflow-y-auto"
+    style="scrollbar-width: none; -ms-overflow-style: none;"
+  >
+    {#if filteredPosts.length > 0}
+      {#each filteredPosts as post}
+        <a
+          href={url(`/posts/${post.slug}/`)}
+          class="group flex flex-col gap-1 p-2.5 -mx-2 rounded-xl hover:bg-[var(--btn-plain-bg-hover)] transition-all duration-200"
+        >
+          <div
+            class="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-[var(--primary)] transition-colors line-clamp-2 leading-relaxed"
+          >
+            {post.title}
+          </div>
+          <div
+            class="flex items-center gap-2 text-xs text-neutral-400 group-hover:text-[var(--primary)]/70 transition-colors"
+          >
+            <div class="w-1.5 h-1.5 rounded-full bg-[var(--primary)]"></div>
+            <span>{formatDate(post.updated || post.published)}</span>
+          </div>
+        </a>
+      {/each}
+    {:else}
+      <div
+        class="flex flex-col items-center justify-center py-6 text-neutral-400 gap-2"
+      >
+        <div class="text-xs">近 {daysRange} 天无更新</div>
+      </div>
+    {/if}
+  </div>
+</div>
+
+<style>
+  /* Ensure no scrollbar shows even if inline styles fail */
+  div::-webkit-scrollbar {
+    display: none;
+  }
+</style>
