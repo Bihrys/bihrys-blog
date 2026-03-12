@@ -85,3 +85,90 @@ const style = Astro.props.style;
     .welcome-message {
         padding-bottom: 0.75rem;
         margin-bottom: 0.75rem;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    .welcome-message p {
+        margin: 0;
+        line-height: 1.6;
+    }
+    .visitor-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .info-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    /* 图标容器 - 简约圆形 */
+    .icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.08);
+        transition: background 0.2s ease;
+    }
+    .icon-wrapper:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    /* 每个图标使用不同的柔和颜色 */
+    .icon-ip svg { color: #a78bfa; }
+    .icon-location svg { color: #f472b6; }
+    .icon-distance svg { color: #67e8f9; }
+    .icon-isp svg { color: #6ee7b7; }
+    .icon-os svg { color: #fbbf24; }
+    .icon-browser svg { color: #93c5fd; }
+    .info-label {
+        min-width: 70px;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 500;
+    }
+    .info-value {
+        word-break: break-all;
+        overflow-wrap: break-word;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    /* IP 纯净度检测区域 */
+    .ip-purity-section {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+    .purity-check-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .purity-check-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.25);
+        color: rgba(255, 255, 255, 0.95);
+    }
+    .purity-check-btn.expanded {
+        border-radius: 8px 8px 0 0;
+        border-bottom: none;
+    }
+    .purity-check-btn.loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
