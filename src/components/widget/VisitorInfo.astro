@@ -172,3 +172,90 @@ const style = Astro.props.style;
         pointer-events: none;
         opacity: 0.7;
     }
+    .purity-result {
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .purity-result.hidden {
+        display: none;
+    }
+    .ippure-card-link {
+        display: block;
+    }
+    .ippure-card-img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 0 0 6px 6px;
+    }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 博主位置坐标 - 中国吉林长春
+    const BLOGGER_LAT = 43.8171;
+    const BLOGGER_LON = 125.3235;
+
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 0.5 - Math.cos(dLat) / 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * (1 - Math.cos(dLon)) / 2;
+        return Math.round(R * 2 * Math.asin(Math.sqrt(a)));
+    };
+
+    const getOS = () => {
+      const ua = navigator.userAgent;
+      if (ua.includes('Win')) return 'Windows';
+      if (ua.includes('Mac')) return 'MacOS';
+      if (ua.includes('Linux')) return 'Linux';
+      if (ua.includes('Android')) return 'Android';
+      if (ua.includes('like Mac')) return 'iOS';
+      return 'Unknown';
+    };
+
+    const getBrowser = () => {
+      const ua = navigator.userAgent;
+      if (ua.includes('Chrome') && !ua.includes('Edg')) return 'Chrome';
+      if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+      if (ua.includes('Firefox')) return 'Firefox';
+      if (ua.includes('Edg')) return 'Edge';
+      return 'Unknown';
+    };
+    
+    const setInfo = (id: string, text: string) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    };
+    
+    const setAllToFailure = () => {
+        setInfo('ip-address', '获取失败');
+        setInfo('location', '获取失败');
+        setInfo('isp', '获取失败');
+        setInfo('distance', '获取失败');
+    };
+
+    interface ParsedData {
+        ip?: string;
+        location?: string;
+        isp?: string;
+        lat?: number;
+        lon?: number;
+    }
+
+    interface ApiEndpoint {
+        name: string;
+        url: string;
+        parser: (data: any) => ParsedData | null;
+    }
+
+    const apiEndpoints: ApiEndpoint[] = [
+        { 
+            name: 'ip.sb', 
+            url: 'https://api.ip.sb/geoip', 
+            parser: (data: any) => ({ 
+                ip: data.ip, 
+                location: `${data.country || ''}, ${data.city || ''}`, 
