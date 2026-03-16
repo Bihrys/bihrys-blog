@@ -259,3 +259,90 @@ const style = Astro.props.style;
             parser: (data: any) => ({ 
                 ip: data.ip, 
                 location: `${data.country || ''}, ${data.city || ''}`, 
+                isp: data.organization, 
+                lat: data.latitude, 
+                lon: data.longitude 
+            }) 
+        },
+        { 
+            name: 'ipinfo.io', 
+            url: 'https://ipinfo.io/json', 
+            parser: (data: any) => {
+                const [lat, lon] = data.loc ? data.loc.split(',') : [null, null];
+                return { 
+                    ip: data.ip, 
+                    location: `${data.country || ''}, ${data.city || ''}`, 
+                    isp: data.org, 
+                    lat: parseFloat(lat), 
+                    lon: parseFloat(lon) 
+                };
+            }
+        },
+        {
+            name: 'api.vore.top',
+            url: 'https://api.vore.top/api/IPdata',
+            parser: (data: any) => {
+                if(data.code !== 200 || !data.ipinfo) return null;
+                return { 
+                    ip: data.ipinfo.ip, 
+                    location: `${data.ipinfo.info.country || ''}, ${data.ipinfo.info.province || ''}, ${data.ipinfo.info.city || ''}`.replace(/, $/, ''), 
+                    isp: data.ipinfo.info.isp, 
+                    lat: data.ipinfo.adcode?.lat, 
+                    lon: data.ipinfo.adcode?.lng 
+                }
+            }
+        },
+        {
+            name: 'ipwho.is',
+            url: 'https://ipwho.is/',
+            parser: (data: any) => {
+                if (!data.success) return null;
+                return { 
+                    ip: data.ip, 
+                    location: `${data.country || ''}, ${data.city || ''}`, 
+                    isp: data.isp, 
+                    lat: data.latitude, 
+                    lon: data.longitude 
+                }
+            }
+        },
+        { 
+            name: 'freegeoip.app', 
+            url: 'https://freegeoip.app/json/', 
+            parser: (data: any) => ({ 
+                ip: data.ip, 
+                location: `${data.country_name || ''}, ${data.city || ''}`, 
+                isp: '', 
+                lat: data.latitude, 
+                lon: data.longitude 
+            }) 
+        },
+        { 
+            name: 'ipapi.co', 
+            url: 'https://ipapi.co/json/', 
+            parser: (data: any) => ({ 
+                ip: data.ip, 
+                location: `${data.country_name || ''}, ${data.city || ''}`, 
+                isp: data.org, 
+                lat: data.latitude, 
+                lon: data.longitude 
+            }) 
+        },
+        { 
+            name: 'vvhan.com', 
+            url: 'https://api.vvhan.com/api/ipInfo?type=json', 
+            parser: (data: any) => data.success ? { 
+                ip: data.ip, 
+                location: `${data.info.country || ''}, ${data.info.city || ''}`, 
+                isp: data.info.isp 
+            } : null 
+        },
+        { 
+            name: 'ip-api.com', 
+            url: 'https://ip-api.com/json', 
+            parser: (data: any) => data.status === 'success' ? { 
+                ip: data.query, 
+                location: `${data.country || ''}, ${data.city || ''}`, 
+                isp: data.isp, 
+                lat: data.lat, 
+                lon: data.lon 
