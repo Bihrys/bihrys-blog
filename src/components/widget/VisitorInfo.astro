@@ -346,3 +346,90 @@ const style = Astro.props.style;
                 isp: data.isp, 
                 lat: data.lat, 
                 lon: data.lon 
+            } : null 
+        }
+    ];
+
+    const fetchIpInfo = async () => {
+        setInfo('os', getOS());
+        setInfo('browser', getBrowser());
+
+        let finalData: ParsedData = {};
+
+        for (const api of apiEndpoints) {
+            if (finalData.lat && finalData.lon) break;
+            
+            try {
+                const response = await fetch(api.url);
+                if (!response.ok) throw new Error(`Response not OK for ${api.name}`);
+                const data = await response.json();
+                const parsed = api.parser(data);
+                if (parsed) {
+                    finalData = { ...finalData, ...parsed };
+                }
+            } catch {
+                // 静默处理，继续尝试下一个 API
+            }
+        }
+
+        if (finalData.ip && !finalData.lat) {
+            console.log(`Have IP (${finalData.ip}) but no coordinates. Trying final lookup.`);
+            try {
+                const response = await fetch(`https://ip-api.com/json/${finalData.ip}`);
+                if (!response.ok) throw new Error('Final lookup failed');
+                const data = await response.json();
+                if (data.status === 'success') {
+                    finalData.lat = data.lat;
+                    finalData.lon = data.lon;
+                }
+            } catch {
+                // 静默处理
+            }
+        }
+
+        if (finalData.ip) {
+            setInfo('ip-address', finalData.ip);
+            setInfo('location', finalData.location || 'N/A');
+            setInfo('isp', finalData.isp || 'N/A');
+            
+            if (finalData.lat && finalData.lon) {
+                const dist = calculateDistance(BLOGGER_LAT, BLOGGER_LON, finalData.lat, finalData.lon);
+                setInfo('distance', `约 ${dist} 公里`);
+            } else {
+                setInfo('distance', '无法计算');
+            }
+        } else {
+            setAllToFailure();
+        }
+    };
+
+    fetchIpInfo();
+
+    // IP 信息卡片切换显示
+    const setupPurityCheck = () => {
+        const btn = document.getElementById('ip-purity-btn') as HTMLButtonElement | null;
+        const resultDiv = document.getElementById('ip-purity-result');
+        const cardImg = document.getElementById('ippure-card-img') as HTMLImageElement | null;
+        if (!btn || !resultDiv || !cardImg) return;
+
+        const baseSrc = cardImg.dataset.src || 'https://my.ippure.com/v1/card';
+        let isExpanded = false;
+
+        // 图片加载完成事件
+        cardImg.addEventListener('load', () => {
+            btn.classList.remove('loading');
+            const btnSpan = btn.querySelector('span');
+            if (btnSpan && isExpanded) btnSpan.textContent = '收起 IP 信息卡';
+        });
+
+        // 图片加载失败事件
+        cardImg.addEventListener('error', () => {
+            btn.classList.remove('loading');
+            const btnSpan = btn.querySelector('span');
+            if (btnSpan) btnSpan.textContent = '加载失败，点击重试';
+            isExpanded = false;
+            resultDiv.classList.add('hidden');
+            btn.classList.remove('expanded');
+        });
+
+        btn.addEventListener('click', () => {
