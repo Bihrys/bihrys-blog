@@ -433,3 +433,29 @@ const style = Astro.props.style;
         });
 
         btn.addEventListener('click', () => {
+            if (btn.classList.contains('loading')) return; // 加载中禁止点击
+            
+            isExpanded = !isExpanded;
+            
+            if (isExpanded) {
+                // 显示加载状态
+                btn.classList.add('loading');
+                const btnSpan = btn.querySelector('span');
+                if (btnSpan) btnSpan.textContent = '查询中...';
+                
+                // 每次展开时加载新图片（添加时间戳防止缓存）
+                cardImg.src = `${baseSrc}?t=${Date.now()}`;
+                resultDiv.classList.remove('hidden');
+                btn.classList.add('expanded');
+            } else {
+                resultDiv.classList.add('hidden');
+                btn.classList.remove('expanded');
+                const btnSpan = btn.querySelector('span');
+                if (btnSpan) btnSpan.textContent = '查看 IP 信息卡';
+            }
+        });
+    };
+
+    setupPurityCheck();
+  });
+</script>
