@@ -85,3 +85,90 @@ export const POST: APIRoute = async ({ request }) => {
 						success: true,
 						message: "No new URLs to submit",
 						totalUrls: currentUrls.length,
+						submittedUrls: submittedUrls.size,
+						newUrls: 0,
+						savedQuota: currentUrls.length,
+						isIncremental: true,
+						lastSubmitted: submittedData.lastSubmitted,
+						totalSubmissions: submittedData.totalSubmissions || 0,
+					}),
+					{
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					},
+				);
+			}
+
+			urlsToSubmit = newUrls;
+			isIncremental = true;
+			console.log(
+				`Incremental mode: Submitting ${newUrls.length} new URLs to IndexNow`,
+			);
+		} else {
+			console.log(
+				`Force mode: Submitting all ${urlsToSubmit.length} URLs to IndexNow`,
+			);
+		}
+
+		// IndexNow 官方配置
+		const key = "4ff84931e3084c36bcc43c09ec05df75";
+		const host = "bihrys.com";
+		const keyLocation = `${baseUrl}/${key}.txt`;
+
+		// 按照官方格式提交到 api.indexnow.org
+		const response = await fetch("https://api.indexnow.org/IndexNow", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json; charset=utf-8",
+				"User-Agent": "Bihrys-Blog-IndexNow/1.0",
+			},
+			body: JSON.stringify({
+				host,
+				key,
+				keyLocation,
+				urlList: urlsToSubmit,
+			}),
+		});
+
+		console.log(`IndexNow response: ${response.status} ${response.statusText}`);
+
+		// IndexNow API 通常返回 HTTP 200 (成功) 或 202 (已接受)
+		const isSuccess = response.status === 200 || response.status === 202;
+
+		let responseText = "";
+		try {
+			responseText = await response.text();
+			console.log("IndexNow response body:", responseText);
+		} catch (e) {
+			console.log("No response body or failed to read response");
+		}
+
+		if (isSuccess) {
+			// 更新已提交URL记录
+			const submittedData = getSubmittedUrls();
+			const submittedUrls = new Set(submittedData.urls || []);
+
+			const updatedSubmittedData = {
+				urls: forceSubmit ? urlsToSubmit : [...submittedUrls, ...urlsToSubmit],
+				lastSubmitted: new Date().toISOString(),
+				totalSubmissions: (submittedData.totalSubmissions || 0) + 1,
+				lastSubmissionDetails: {
+					newUrlsCount: urlsToSubmit.length,
+					totalUrlsCount: currentUrls.length,
+					timestamp: new Date().toISOString(),
+					status: response.status,
+					isIncremental,
+					forceSubmit,
+				},
+			};
+
+			saveSubmittedUrls(updatedSubmittedData);
+		}
+
+		return new Response(
+			JSON.stringify({
+				success: isSuccess,
+				message: isSuccess
+					? `URLs submitted to IndexNow successfully (${isIncremental ? "incremental" : "full"} mode)`
+					: `IndexNow submission failed: HTTP ${response.status}`,
+				totalUrls: urlsToSubmit.length,
