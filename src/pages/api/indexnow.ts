@@ -172,3 +172,40 @@ export const POST: APIRoute = async ({ request }) => {
 					? `URLs submitted to IndexNow successfully (${isIncremental ? "incremental" : "full"} mode)`
 					: `IndexNow submission failed: HTTP ${response.status}`,
 				totalUrls: urlsToSubmit.length,
+				totalSiteUrls: currentUrls.length,
+				savedQuota: isIncremental
+					? currentUrls.length - urlsToSubmit.length
+					: 0,
+				isIncremental,
+				forceSubmit,
+				status: response.status,
+				statusText: response.statusText,
+				responseBody: responseText,
+				submittedUrls: urlsToSubmit,
+				endpoint: "https://api.indexnow.org/IndexNow",
+				submittedAt: new Date().toISOString(),
+			}),
+			{
+				status: 200,
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+	} catch (error) {
+		console.error("IndexNow API error:", error);
+		return new Response(
+			JSON.stringify({
+				success: false,
+				error: error instanceof Error ? error.message : "Unknown error",
+				endpoint: "https://api.indexnow.org/IndexNow",
+			}),
+			{
+				status: 500,
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+	}
+};
