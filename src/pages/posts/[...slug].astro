@@ -172,3 +172,90 @@ const jsonLd = {
                     if (!shareButton) return;
 
                     // Swup 会替换页面内容；避免重复绑定
+                    if (shareButton.dataset.shareBound === '1') return;
+                    shareButton.dataset.shareBound = '1';
+
+                    const shareText = shareButton.querySelector('#share-text');
+                    if (!shareText) return;
+
+                    shareButton.addEventListener('click', function() {
+                        const url = window.location.href;
+
+                        function showSuccess() {
+                            const originalText = shareText.textContent;
+                            shareText.textContent = '已复制!';
+                            shareButton.style.backgroundColor = 'var(--primary)';
+                            shareButton.style.color = 'white';
+
+                            setTimeout(function() {
+                                shareText.textContent = originalText || '分享';
+                                shareButton.style.backgroundColor = '';
+                                shareButton.style.color = '';
+                            }, 2000);
+                        }
+
+                        function showFailure() {
+                            shareText.textContent = '复制失败';
+                            setTimeout(function() {
+                                shareText.textContent = '分享';
+                            }, 2000);
+                        }
+
+                        // Safari 兼容 fallback
+                        function fallbackCopy(text) {
+                            const textArea = document.createElement('textarea');
+                            textArea.value = text;
+
+                            textArea.style.position = 'fixed';
+                            textArea.style.top = '0';
+                            textArea.style.left = '0';
+                            textArea.style.width = '2em';
+                            textArea.style.height = '2em';
+                            textArea.style.padding = '0';
+                            textArea.style.border = 'none';
+                            textArea.style.outline = 'none';
+                            textArea.style.boxShadow = 'none';
+                            textArea.style.background = 'transparent';
+                            textArea.setAttribute('readonly', '');
+                            textArea.style.opacity = '0';
+
+                            document.body.appendChild(textArea);
+
+                            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                            if (isIOS) {
+                                const range = document.createRange();
+                                range.selectNodeContents(textArea);
+                                const selection = window.getSelection();
+                                selection.removeAllRanges();
+                                selection.addRange(range);
+                                textArea.setSelectionRange(0, 999999);
+                            } else {
+                                textArea.select();
+                            }
+
+                            let success = false;
+                            try {
+                                success = document.execCommand('copy');
+                            } catch (err) {
+                                console.error('[Share] execCommand failed:', err);
+                            }
+
+                            document.body.removeChild(textArea);
+                            return success;
+                        }
+
+                        if (navigator.clipboard && window.isSecureContext) {
+                            navigator.clipboard.writeText(url).then(function() {
+                                showSuccess();
+                            }).catch(function(err) {
+                                console.warn('[Share] Clipboard API failed, trying fallback:', err);
+                                if (fallbackCopy(url)) {
+                                    showSuccess();
+                                } else {
+                                    showFailure();
+                                }
+                            });
+                        } else {
+                            if (fallbackCopy(url)) {
+                                showSuccess();
+                            } else {
