@@ -172,3 +172,90 @@ $ clang -E main.c -o clang.i
 
 发现`main()`函数部分代码一样，都是：
 
+``` c
+int main(void)
+{
+    int sum = 0, i = 0;
+    char input[5];
+
+    while (1) {
+        sum = 0;
+        scanf("%s", input);
+        for (i = 0; input[i] != '\0'; i++)
+            sum = sum*10 + input[i] - '0';
+        printf("input=%d\n", sum);
+    }
+    return 0;
+}
+```
+
+这也符合我们的认知，因为预处理只是进行了替换操作，不涉及修改函数的逻辑。
+
+在`main()`上方有八百多行代码，两个编译器处理后的文件不一样。不过我们先不去管它，因为这个问题出现的主要原因是 `input` 数组和 `i` 的位置相邻。根据我们的直觉，问题不在头文件。
+
+先把这两个文件放在一边，我们继续。
+
+## 1. 编译
+:::note
+此处的汇编语言是 x86-64 GNU 汇编语言，Windows 无法直接运行。
+:::
+
+编译是指把预处理后的 C 代码翻译成汇编代码。这一步包括语法检查、语义分析、优化等，于是我们有理由怀疑编译器在这一步做了不一样的操作，导致汇编逻辑不一样。
+
+出发吧！
+
+
+``` sh
+$ gcc -S gcc.i -o gcc.s
+$ clang -S clang.i -o clang.s
+```
+
+把这两个文件都贴出来：
+``` asm title="gcc.s"
+	.file	"main.c"
+	.text
+	.section	.rodata
+.LC0:
+	.string	"%s"
+.LC1:
+	.string	"input=%d\n"
+	.text
+	.globl	main
+	.type	main, @function
+main:
+.LFB0:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	subq	$32, %rsp
+	movq	%fs:40, %rax
+	movq	%rax, -8(%rbp)
+	xorl	%eax, %eax
+	movl	$0, -24(%rbp)
+	movl	$0, -20(%rbp)
+.L4:
+	movl	$0, -24(%rbp)
+	leaq	-13(%rbp), %rax
+	leaq	.LC0(%rip), %rdx
+	movq	%rax, %rsi
+	movq	%rdx, %rdi
+	movl	$0, %eax
+	call	__isoc23_scanf@PLT
+	movl	$0, -20(%rbp)
+	jmp	.L2
+.L3:
+	movl	-24(%rbp), %edx
+	movl	%edx, %eax
+	sall	$2, %eax
+	addl	%edx, %eax
+	addl	%eax, %eax
+	movl	%eax, %edx
+	movl	-20(%rbp), %eax
+	cltq
+	movzbl	-13(%rbp,%rax), %eax
+	movsbl	%al, %eax
+	addl	%edx, %eax
+	subl	$48, %eax
