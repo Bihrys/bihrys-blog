@@ -259,3 +259,90 @@ main:
 	movsbl	%al, %eax
 	addl	%edx, %eax
 	subl	$48, %eax
+	movl	%eax, -24(%rbp)
+	addl	$1, -20(%rbp)
+.L2:
+	movl	-20(%rbp), %eax
+	cltq
+	movzbl	-13(%rbp,%rax), %eax
+	testb	%al, %al
+	jne	.L3
+	movl	-24(%rbp), %eax
+	leaq	.LC1(%rip), %rdx
+	movl	%eax, %esi
+	movq	%rdx, %rdi
+	movl	$0, %eax
+	call	printf@PLT
+	jmp	.L4
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.ident	"GCC: (GNU) 15.2.1 20250813"
+	.section	.note.GNU-stack,"",@progbits
+```
+
+```asm title="clang.s"
+	.file	"main.c"
+	.text
+	.globl	main                            # -- Begin function main
+	.p2align	4
+	.type	main,@function
+main:                                   # @main
+	.cfi_startproc
+# %bb.0:
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register %rbp
+	subq	$32, %rsp
+	movl	$0, -4(%rbp)
+	movl	$0, -8(%rbp)
+	movl	$0, -12(%rbp)
+.LBB0_1:                                # =>This Loop Header: Depth=1
+                                        #     Child Loop BB0_2 Depth 2
+	movl	$0, -8(%rbp)
+	leaq	-17(%rbp), %rsi
+	leaq	.L.str(%rip), %rdi
+	movb	$0, %al
+	callq	__isoc99_scanf@PLT
+	movl	$0, -12(%rbp)
+.LBB0_2:                                #   Parent Loop BB0_1 Depth=1
+                                        # =>  This Inner Loop Header: Depth=2
+	movslq	-12(%rbp), %rax
+	movsbl	-17(%rbp,%rax), %eax
+	cmpl	$0, %eax
+	je	.LBB0_5
+# %bb.3:                                #   in Loop: Header=BB0_2 Depth=2
+	imull	$10, -8(%rbp), %eax
+	movslq	-12(%rbp), %rcx
+	movsbl	-17(%rbp,%rcx), %ecx
+	addl	%ecx, %eax
+	subl	$48, %eax
+	movl	%eax, -8(%rbp)
+# %bb.4:                                #   in Loop: Header=BB0_2 Depth=2
+	movl	-12(%rbp), %eax
+	addl	$1, %eax
+	movl	%eax, -12(%rbp)
+	jmp	.LBB0_2
+.LBB0_5:                                #   in Loop: Header=BB0_1 Depth=1
+	movl	-8(%rbp), %esi
+	leaq	.L.str.1(%rip), %rdi
+	movb	$0, %al
+	callq	printf@PLT
+	jmp	.LBB0_1
+.Lfunc_end0:
+	.size	main, .Lfunc_end0-main
+	.cfi_endproc
+                                        # -- End function
+	.type	.L.str,@object                  # @.str
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.L.str:
+	.asciz	"%s"
+	.size	.L.str, 3
+
+	.type	.L.str.1,@object                # @.str.1
+.L.str.1:
+	.asciz	"input=%d\n"
+	.size	.L.str.1, 10
+
