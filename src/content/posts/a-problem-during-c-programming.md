@@ -346,3 +346,90 @@ main:                                   # @main
 	.asciz	"input=%d\n"
 	.size	.L.str.1, 10
 
+	.ident	"clang version 20.1.8"
+	.section	".note.GNU-stack","",@progbits
+	.addrsig
+	.addrsig_sym __isoc99_scanf
+	.addrsig_sym printf
+```
+来看看`gcc.s`：
+``` asm showLineNumbers startLineNumber=12
+.LFB0:
+  .cfi_startproc
+  pushq  %rbp
+  .cfi_def_cfa_offset 16
+  .cfi_offset 6, -16
+  movq  %rsp, %rbp
+  .cfi_def_cfa_register 6
+  subq  $32, %rsp           # 预留 32 字节栈帧给局部变量
+  movq  %fs:40, %rax
+  movq  %rax, -8(%rbp)
+  xorl  %eax, %eax
+  movl  $0, -24(%rbp)       # sum = 0;
+  movl  $0, -20(%rbp)       # i = 0;
+.L4:
+  movl	$0, -24(%rbp)       # sum = 0;
+  leaq	-13(%rbp), %rax     # input[0] 的位置在-13(%rbp)
+    ...
+```
+
+再看看`clang.s`是如何处理的：
+
+``` asm showLineNumbers startLineNumber=6
+main:                                   # @main
+	.cfi_startproc
+# %bb.0:
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset %rbp, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register %rbp
+	subq	$32, %rsp       # 预留 32 字节栈帧给局部变量
+	movl	$0, -4(%rbp)    # 返回值临时保留位，本程序未使用
+	movl	$0, -8(%rbp)    # sum = 0;
+	movl	$0, -12(%rbp)   # i = 0;
+.LBB0_1:                                # =>This Loop Header: Depth=1
+                                        #     Child Loop BB0_2 Depth 2
+	movl	$0, -8(%rbp)    # sum = 0;
+	leaq	-17(%rbp), %rsi # input[0] 的位置在-17(%rbp)
+    ...
+```
+
+好啦，这下就清楚了！
+
+我们来画一下栈：
+
+### GCC 栈
+|位置|变量|
+|---|---|
+|-9| input[4] |
+|-10| input[3] |
+|-11| input[2] |
+|-12| input[1] |
+|-13| input[0] |
+|...|...|
+|-20| i |
+|-24| sum |
+
+### Clang 栈
+|位置|变量|
+|---|---|
+|-8|sum|
+|-12|i|
+|-13| input[4] |
+|-14| input[3] |
+|-15| input[2] |
+|-16| input[1] |
+|-17| input[0] |
+
+因此，我们得出了结论：
+
+**GCC为`i`和`input[0]`之间留足了栈帧，并且`input[4]`之后也没有变量可以影响循环，因此没出问题。**
+**而Clang让`input[4]`和`i`紧靠在一起，增加了数组越界的风险。**
+
+## 2. 汇编
+## 3. 链接
+
+哎呀这两个标题和本文没关系，加上只是为了目录更好看（
+
+# 验证猜想
