@@ -520,3 +520,22 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   Stack use after scope:   f8
   Global redzone:          f9
   Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==16748==ABORTING
+```
+
+看得出来，加上参数确实有助于规避数组越界风险。
+
+**不过，最有效的方法还是事先考虑好所有情况，防范任何可能出现的 Bug！**~~（酒吧点炒饭.txt）~~
+
+# 写在最后
+
+这是我第一次写这种类型的文章，算是对自己独立解决问题能力的一次检验吧！
+
+~~也不知道会不会有人看这篇文章，当作日记得了。~~ 如果有人看到这里，感谢大家阅读！
