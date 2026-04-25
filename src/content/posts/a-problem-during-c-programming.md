@@ -433,3 +433,90 @@ main:                                   # @main
 哎呀这两个标题和本文没关系，加上只是为了目录更好看（
 
 # 验证猜想
+
+我们用 GCC 看看`input[-7]`？按道理就是`i`了吧！
+修改程序为
+
+```c title="test.c"
+#include <stdio.h>
+
+int main(void)
+{
+    int sum = 0, i = 0;
+    char input[5];
+
+    while (1) {
+        sum = 0;
+        scanf("%s", input);
+        for (i = 0; input[i] != '\0'; i++)
+            sum = sum*10 + input[i] - '0';
+        printf("input=%d\n", sum);
+        printf("%d\n", input[-7]);
+    }
+    return 0;
+}
+```
+
+运行程序：
+``` sh
+$ gcc test.c -o test
+$ ./test
+12345
+input=12345
+5
+```
+大功告成！**果然，`input[-7]` 就是 `i`！**
+
+# 如何规避风险？
+
+> *`-O0`了吗？`-fsanitize=address`了吗？快加上！*
+
+一位群友如是说。
+好吧好吧，我们加上这两个参数再编译一次试试：
+``` sh
+$ gcc -O0 -fsanitize=address test.c -o test
+$ ./test
+1234567
+=================================================================
+==16748==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7b4c18f00025 at pc 0x7f4c1ba6e51d bp 0x7ffdce2744c0 sp 0x7ffdce273c48
+WRITE of size 8 at 0x7b4c18f00025 thread T0
+    #0 0x7f4c1ba6e51c in scanf_common /usr/src/debug/gcc/gcc/libsanitizer/sanitizer_common/sanitizer_common_interceptors_format.inc:342
+    #1 0x7f4c1ba8edee in __isoc23_vscanf /usr/src/debug/gcc/gcc/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:1554
+    #2 0x7f4c1ba8f5f5 in __isoc23_scanf /usr/src/debug/gcc/gcc/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:1584
+    #3 0x564e475b9254 in main (/home/sakimidare/CLionProjects/c_study/test+0x1254) (BuildId: 35fabe8824d13d3c1ca4e2836107a3b16992a4a9)
+    #4 0x7f4c1b627674  (/usr/lib/libc.so.6+0x27674) (BuildId: 4fe011c94a88e8aeb6f2201b9eb369f42b4a1e9e)
+    #5 0x7f4c1b627728 in __libc_start_main (/usr/lib/libc.so.6+0x27728) (BuildId: 4fe011c94a88e8aeb6f2201b9eb369f42b4a1e9e)
+    #6 0x564e475b90d4 in _start (/home/sakimidare/CLionProjects/c_study/test+0x10d4) (BuildId: 35fabe8824d13d3c1ca4e2836107a3b16992a4a9)
+
+Address 0x7b4c18f00025 is located in stack of thread T0 at offset 37 in frame
+    #0 0x564e475b91b8 in main (/home/sakimidare/CLionProjects/c_study/test+0x11b8) (BuildId: 35fabe8824d13d3c1ca4e2836107a3b16992a4a9)
+
+  This frame has 1 object(s):
+    [32, 37) 'input' (line 6) <== Memory access at offset 37 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow (/home/sakimidare/CLionProjects/c_study/test+0x1254) (BuildId: 35fabe8824d13d3c1ca4e2836107a3b16992a4a9) in main
+Shadow bytes around the buggy address:
+  0x7b4c18effd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18effe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18effe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18efff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18efff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7b4c18f00000: f1 f1 f1 f1[05]f3 f3 f3 00 00 00 00 00 00 00 00
+  0x7b4c18f00080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18f00100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18f00180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18f00200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b4c18f00280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
