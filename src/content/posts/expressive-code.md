@@ -172,3 +172,90 @@ this is a regular line
 
 #### Combining syntax highlighting with diff-like syntax
 
+```diff lang="js"
+  function thisIsJavaScript() {
+    // This entire block gets highlighted as JavaScript,
+    // and we can still add diff markers to it!
+-   console.log('Old code to be removed')
++   console.log('New and shiny code!')
+  }
+```
+
+#### Marking individual text inside lines
+
+```js "given text"
+function demo() {
+  // Mark any given text inside lines
+  return 'Multiple matches of the given text are supported';
+}
+```
+
+#### Regular expressions
+
+```ts /ye[sp]/
+console.log('The words yes and yep will be marked.')
+```
+
+#### Escaping forward slashes
+
+```sh /\/ho.*\//
+echo "Test" > /home/test.txt
+```
+
+#### Selecting inline marker types (mark, ins, del)
+
+```js "return true;" ins="inserted" del="deleted"
+function demo() {
+  console.log('These are inserted and deleted marker types');
+  // The return statement uses the default marker type
+  return true;
+}
+```
+
+### Word Wrap
+
+[Word Wrap](https://expressive-code.com/key-features/word-wrap/)
+
+#### Configuring word wrap per block
+
+```js wrap
+// Example with wrap
+function getLongString() {
+  return 'This is a very long string that will most probably not fit into the available space unless the container is extremely wide'
+}
+```
+
+---
+
+```js wrap=false
+// Example with wrap=false
+function getLongString() {
+  return 'This is a very long string that will most probably not fit into the available space unless the container is extremely wide'
+}
+```
+
+#### Configuring indentation of wrapped lines
+
+```js wrap preserveIndent
+// Example with preserveIndent (enabled by default)
+function getLongString() {
+  return 'This is a very long string that will most probably not fit into the available space unless the container is extremely wide'
+}
+```
+
+---
+
+```js wrap preserveIndent=false
+// Example with preserveIndent=false
+function getLongString() {
+  return 'This is a very long string that will most probably not fit into the available space unless the container is extremely wide'
+}
+```
+
+## Collapsible Sections
+
+[Collapsible Sections](https://expressive-code.com/plugins/collapsible-sections/)
+
+```js collapse={1-5, 12-14, 21-24}
+// All this boilerplate setup code will be collapsed
+import { someBoilerplateEngine } from '@example/some-boilerplate'
