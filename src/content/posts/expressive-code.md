@@ -259,3 +259,53 @@ function getLongString() {
 ```js collapse={1-5, 12-14, 21-24}
 // All this boilerplate setup code will be collapsed
 import { someBoilerplateEngine } from '@example/some-boilerplate'
+import { evenMoreBoilerplate } from '@example/even-more-boilerplate'
+
+const engine = someBoilerplateEngine(evenMoreBoilerplate())
+
+// This part of the code will be visible by default
+engine.doSomething(1, 2, 3, calcFn)
+
+function calcFn() {
+  // You can have multiple collapsed sections
+  const a = 1
+  const b = 2
+  const c = a + b
+
+  // This will remain visible
+  console.log(`Calculation result: ${a} + ${b} = ${c}`)
+  return c
+}
+
+// All this code until the end of the block will be collapsed again
+engine.closeConnection()
+engine.freeMemory()
+engine.shutdown({ reason: 'End of example boilerplate code' })
+```
+
+## Line Numbers
+
+[Line Numbers](https://expressive-code.com/plugins/line-numbers/)
+
+### Displaying line numbers per block
+
+```js showLineNumbers
+// This code block will show line numbers
+console.log('Greetings from line 2!')
+console.log('I am on line 3')
+```
+
+---
+
+```js showLineNumbers=false
+// Line numbers are disabled for this block
+console.log('Hello?')
+console.log('Sorry, do you know what line I am on?')
+```
+
+### Changing the starting line number
+
+```js showLineNumbers startLineNumber=5
+console.log('Greetings from line 5!')
+console.log('I am on line 6')
+```
