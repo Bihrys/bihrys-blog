@@ -520,3 +520,74 @@ A: 过去个人电脑计算能力相当不够且内存小，给黑客的学习�
 选择用来学习的机器时重要的一点是注意配件是否是Linux兼容的（或BSD兼容，如果你选择学 BSD）。同刚才提到的一样，大多数现在的机器都是符合的；唯一的值得注意的地方在于 调制解调器和打印机；有些具备为Windows设计的配件的机器不会在Linux下工作。
 
 关于硬件兼容性有一个FAQ；最新版本在[这里][hardware howto]。
+
+Q: <a name="started2">我想做贡献。你能帮我挑选一个问题来处理吗？</a>
+
+A: 不行。因为我不知道你擅长什么，也不知道你对什么感兴趣。你需要做到自我驱动，否则无法进步。这也是为什么让别人帮你挑选方向几乎都不会有用。
+
+Q: <a name="MS_hater">我得因此憎恨和反对Microsoft吗？</a>
+
+A: 不，你不必如此。不是因为Microsoft不令人讨厌，而是因为黑客文化早在Microsoft出现之前就存在了，且将在Microsoft成为历史后依然存在。你耗费在憎恨Microsoft的任何力气不如花在热爱你的技术上。写好的代码——那会相当有效地打击Microsoft又不会让你得到恶报。
+
+Q: <a name="no_living">但开放源代码软件不会使程序员丢饭碗吗？</a>
+
+A: 看起来不太可能——目前为止，开放源代码软件产业似乎创造了更多的就业机会而不是减少就业机会。如果写一个程序比起不写来是纯经济收益的话，那么在写完后，程序员应该得到报酬不管程序是否是开放源代码。并且，无论写出多么“免费自由”的软件，都存在更多对新的，定制的软件的需求。我有这方面更多的论述，放在[Open Source][Open Source]网站资料中。
+
+Q: <a name="problems">哪里有免费的Unix？</a>
+
+A: 如果你的机器上还没有安装Unix，我在本文的其他地方已经指出了从哪里可以获取到常用的免费Unix。作为一名黑客，你需要自立自强，以及自学能力。现在开始吧……
+
+[gilder]: /images/glider.png
+[Jargon File]: http://www.catb.org/jargon
+[hacker-howto]: http://catb.org/~esr/faqs/hacker-howto.html
+[Arabic]: http://www.slashproc.net/doc/howto-ar.html
+[Belorussian]: http://moneyaisle.com/worldwide/how-to-become-a-hacker-be
+[Chinese]: http://www.0x08.org/docs/hacker-howto.html
+[Chinese_Latest]: https://github.com/zer4tul/hacker-howto
+[Czech]: http://jjk.kybli.net/projekty/jakse-stat-hackerem.html
+[Danish]: http://www.olemichaelsen.dk/hacker-howto.html
+[Dutch]: http://www.knudde.be/index.php?page_name=hacker_howto
+[Estonian]: http://www.kakupesa.net/hacker/
+[German]: http://www.linuxtaskforce.de/hacker-howto-ger.html
+[Greek]: http://users.otenet.gr/~indy90/hacker-howto-gr/
+[Italian]: http://www.victorfleur.com/documents/hacker.html
+[Hebrew]: http://he.wikisource.org/wiki/%D7%90%D7%99%D7%9A_%D7%9C%D7%94%D7%99%D7%95%D7%AA_%D7%94%D7%90%D7%A7%D7%A8
+[Norwegian]: http://stian.atlantiscrew.net/doc/hacker-howto.html
+[Persian]: http://ashiyane.org/forums/showthread.php?t=20570
+[Brazilian-Portuguese]: http://jvdm.sdf1.org/pt/raquer-howto/
+[Romanian]: http://garaj.xhost.ro/hacker-howto/hacker-howto.ro.htm
+[Spanish]: http://www.sindominio.net/biblioweb/telematica/hacker-como.html
+[Turkish]: http://www.belgeler.org/howto/hacker-howto/hacker-howto.html
+[Swedish]: http://www1.tripnet.se/~mly/open/faqs/hacker-howto.se.html
+[life]: http://dmoz.org/Computers/Artificial_Life/Cellular_Automata/
+[glider]: http://www.catb.org/~esr/hacker-emblem/
+[Patreon]:http://patreon.com/esr
+[SubscribeStar]:https://www.subscribestar.com/esr
+[Loadsharers]:http://www.catb.org/esr/loadsharers/
+[alt.2600]: news:alt.2600
+[evaluation of Python]: http://www.linuxjournal.com/article/3882
+[tutorials]: http://docs.python.org/tutorial/index.html
+[Computer Science Circles]: http://cscircles.cemc.uwaterloo.ca/
+[critique of java]: http://www.crosstalkonline.org/storage/issue-archives/2008/200801/200801-Dewar.pdf
+[Teach Yourself Programming in Ten Years]: http://www.norvig.com/21-days.html
+[Loginataka]: http://catb.org/~esr/faqs/loginataka.html
+[The Art Of Unix Programming]: http://catb.org/~esr/writings/taoup/
+[Linux Online!]: http://www.linux.org/
+[Ubuntu]: http://www.ubuntu.com/
+[basics of Unix and the Internet]: http://en.tldp.org/HOWTO/Unix-and-Internet-Fundamentals-HOWTO/index.html
+[HTML Tutorial]: http://htmldog.com/
+[The HTML Hell Page]: http://catb.org/~esr/html-hell.html
+[open-source]: http://www.opensource.org/
+[Great Hackers]: http://www.paulgraham.com/gh.html
+[Things Every Hacker Once Knew]: http://catb.org/~esr/faqs/things-every-hacker-once-knew
+[Undergraduation]: http://www.paulgraham.com/college.html
+[How To Be A Programmer]: http://samizdat.mines.edu/howto/HowToBeAProgrammer.html
+[A Brief History Of Hackerdom]: http://catb.org/~esr/writings/hacker-history/hacker-history.html
+[The Cathedral and the Bazaar]: http://catb.org/~esr/writings/cathedral-bazaar/index.html
+[Homesteading the Noosphere]: http://catb.org/~esr/writings/homesteading/
+[LDP]: http://www.tldp.org/
+[Linux Reading List HOWTO]: http://en.tldp.org/HOWTO/Reading-List-HOWTO/index.html
+[HTML: The Definitive Guide]: http://www.oreilly.com/catalog/html5/
+[hardware howto]: http://en.tldp.org/HOWTO/Hardware-HOWTO/index.html
+[Open Source]: http://www.opensource.org/
+[How To Learn Hacking]: http://catb.org/~esr/faqs/hacking-howto.html
