@@ -85,3 +85,36 @@ net.train(xtr, ytr, xte, yte, epochs=25, bs=128, lr=0.15)
 仓库已经包含训练好的 `model.json`，不需要先训练模型。克隆项目并启动一个静态文件服务器即可：
 
 ```bash
+git clone https://github.com/Bihrys/mnist-neural-net-visualizer.git
+cd mnist-neural-net-visualizer
+python -m http.server 8000
+```
+
+然后访问 <http://localhost:8000>。
+
+需要注意，不能直接双击 `index.html` 打开。页面通过 `fetch()` 加载 `model.json`，浏览器会阻止网页在 `file://` 协议下读取该文件，因此必须通过 HTTP 访问。
+
+如果想亲自重新训练，只需安装 NumPy 后运行：
+
+```bash
+pip install numpy
+python train.py
+```
+
+脚本会读取项目目录中的 `mnist.npz`，训练结束后重新生成 `model.json`。
+
+## 项目结构
+
+```text
+mnist-neural-net-visualizer/
+├── index.html      # 页面结构
+├── style.css       # 页面样式
+├── app.js          # 画布、预处理、推理与可视化
+├── train.py        # 纯 NumPy 训练脚本
+├── model.json      # 已训练的模型参数
+└── mnist.npz       # MNIST 训练与测试数据
+```
+
+这个项目让我真正把“训练一个模型”和“让模型成为可交互的产品”连接了起来：从 NumPy 中的矩阵运算，到 JSON 模型格式，再到浏览器里的实时推理和可视化，每一步都可以直接打开源码查看。
+
+如果你也对神经网络的工作过程感兴趣，欢迎在 [GitHub](https://github.com/Bihrys/mnist-neural-net-visualizer) 上体验、阅读源码或提出建议。
