@@ -85,3 +85,90 @@ sudo systemctl enable sddm.service
 ## 编辑 niri.service 的 wants
 
 ```sh
+systemctl --user add-wants niri swayidle
+```
+
+这样做可以让 `swayidle` 软件包接管锁屏、睡眠等系统操作。
+:::note
+不需要照着官方文档加上 `waybar` 和 `mako`！我的配置没装这两个软件包，Shell 和通知全由 Noctalia Shell 接管！
+:::
+
+编辑 `~/.config/systemd/user/niri.service.wants/swayidle.service`。
+填入以下配置：
+
+```ini
+[Unit]
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/swayidle -w timeout 601 'niri msg action power-off-monitors' timeout 600 'hyprlock' before-sleep 'hyprlock'
+Restart=on-failure
+```
+
+这个配置是为了无操作 600 秒后用 `hyprlock` 锁屏，601 秒后关闭显示器。
+如果有睡眠、休眠等需求，请查阅 Swaylock 官方文档。
+
+## 修改 Niri 配置文件
+
+创建 `~/.config/niri/config.kdl` 文件并写入配置。
+除了显示器配置，其他你可以抄我的。显示器配置请根据注释自行修改。
+
+``` typescript
+// 键盘鼠标触摸板等输入设备相关配置
+input {
+    keyboard {
+        xkb {
+            layout "us"
+        }
+
+        // 在启动上启用numlock，省略此设置会禁用它。
+        numlock
+    }
+
+    touchpad {
+        tap
+        natural-scroll
+        scroll-method "two-finger"
+    }
+
+    mouse {
+        // 设置鼠标移动速度,-1到1之间由慢到快
+        accel-speed 1
+    }
+
+    // niri默认接管电源按钮的功能是sleep,这里禁用以使用关机功能
+    disable-power-key-handling
+    // 切换mod键：正常使用alt，嵌套窗口内使用Super。
+    mod-key "Super"
+    mod-key-nested "Alt"
+}
+
+// 可以在niri实例中运行`niri msg outputs`找到显示器名称。
+output "HDMI" {
+    // 取消注释以禁用此显示器。
+    off
+
+    // 默认聚焦在这个显示器
+    focus-at-startup
+
+    // 格式为"<width>x<height>" 或者 "<width>x<height>@<refresh rate>".
+    // 如果省略了刷新率，niri将为分辨率选择最高的刷新率。
+    mode "3840x2160@60.000"
+
+    // 您可以使用整数或分数量表，例如，比例为150％。
+    scale 2
+
+    // transform允许逆时针旋转显示，有效值为:
+    // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
+    transform "normal"
+
+    // 输出在所有显示器坐标空间中的位置。未明确配置位置的显示器将放置在所有已放置的显示器右侧。
+    // position x=1280 y=0
+}
+
+// 如果 eDP-2 没有连接，将会默认聚焦在这个显示器
+output "eDP-2" {
+    // off
+    focus-at-startup
