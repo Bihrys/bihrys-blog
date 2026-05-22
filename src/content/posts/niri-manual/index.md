@@ -346,3 +346,90 @@ binds {
 
     // 关闭显示器。移动鼠标或按下任意按键恢复
     Mod+Shift+P { power-off-monitors; }
+}
+
+// 影响窗口的位置和尺寸的设置。
+layout {
+    // 在逻辑像素中设置Windows周围的缝隙。
+    gaps 10
+    background-color "transparent"
+    // 存在多个窗口时，未最大化的窗口不自动居中，方便分屏
+    center-focused-column "never"
+    // 只有一个窗口时自动居中显示
+    always-center-single-column
+
+    // mod+r在预设之间切换的宽度。
+    preset-column-widths {
+        proportion 0.5
+        proportion 0.2444
+        proportion 0.7556
+        // 固定设置逻辑像素的宽度精确设置。（受scale影响）
+        // fixed 1920
+    }
+
+    preset-window-heights {
+        proportion 0.5
+        proportion 0.8
+        proportion 1.0
+    }
+    // 关闭聚焦框
+    focus-ring {
+        // off
+    }
+
+    // 关闭边框
+    border {
+        off
+    }
+}
+
+// 覆盖由niri启动的进程的环境变量
+environment {
+    QT_QPA_PLATFORMTHEME "qt5ct"
+    ALL_PROXY "http://127.0.0.1:7890"
+    LANG "zh_CN.UTF-8"
+    LC_CTYPE "zh_CN.UTF-8"
+    LC_NUMERIC "zh_CN.UTF-8"
+    LC_TIME "zh_CN.UTF-8"
+    LC_COLLATE "zh_CN.UTF-8"
+    LC_MONETARY "zh_CN.UTF-8"
+    LC_MESSAGES "zh_CN.UTF-8"
+    LC_PAPER "zh_CN.UTF-8"
+    LC_NAME "zh_CN.UTF-8"
+    LC_ADDRESS "zh_CN.UTF-8"
+    LC_TELEPHONE "zh_CN.UTF-8"
+    LC_MEASUREMENT "zh_CN.UTF-8"
+    LC_IDENTIFICATION "zh_CN.UTF-8"
+    LC_ALL null
+    // XDG_DATA_DIRS "$HOME/.local/share" "$XDG_DATA_DIRS"
+    // GTK_IM_MODULE "fcitx"
+    QT_IM_MODULE "fcitx"
+    // https://fcitx-im.org/wiki/Using_Fcitx_5_on_Wayland#Sway
+    XMODIFIERS "@im=fcitx"
+    QT_IM_MODULES "wayland;fcitx"
+    GTK_IM_MODULE null
+    SDL_IM_MODULE null
+    GLFW_IM_MODULE null
+}
+spawn-at-startup "niri-switch-daemon"
+
+// 启动niri时自动启动的软件
+spawn-at-startup "/usr/bin/fcitx5"
+// spawn-at-startup "/usr/bin/v2rayn"
+// spawn-at-startup "/usr/bin/waybar"
+spawn-at-startup "/usr/bin/vicinae" "server"
+spawn-at-startup "~/.cargo/bin/soteria"
+spawn-at-startup "~/Desktop/tools/update_repositories.sh"
+spawn-at-startup "qs" "-c" "noctalia-shell"
+spawn-at-startup "/usr/bin/hyprlock"
+// 要运行shell命令（带有变量，管道等），请使用spawn-sh-at-at-startup：
+spawn-sh-at-startup "swaybg -i /path/to/your/wallpaper.png -m fill"
+
+hotkey-overlay {
+    // 跳过“重要的热键”弹出窗口。
+    skip-at-startup
+}
+
+// 设置截图保存的路径，null将会禁止保存到磁盘
+screenshot-path "~/Pictures/ScreenShot/%Y-%m-%d %H-%M-%S.png"
+
