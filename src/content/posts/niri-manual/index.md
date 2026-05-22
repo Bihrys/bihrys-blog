@@ -172,3 +172,90 @@ output "HDMI" {
 output "eDP-2" {
     // off
     focus-at-startup
+    mode "2560x1600@300.000"
+    transform "normal"
+    position x=0 y=0
+}
+
+// 可以使用wev来查询特定的按键对应的XKB名称
+binds {
+    Alt+Tab { spawn "niri-switch"; }
+    // Mod-Shift-/显示重要的热键列表(通常与 Mod-? 相同)。
+    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+D hotkey-overlay-title="Open the File Manager" { spawn "/usr/bin/dolphin"; } 
+    // Mod+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "/usr/bin/swaylock" "-f" "-i" "$HOME/.dotfiles/sway/.config/sway/lock.png"; }
+    Mod+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "/usr/bin/hyprlock"; }
+    Mod+Return hotkey-overlay-title="Open a Terminal" { spawn "/usr/bin/alacritty"; }
+   // Mod+A hotkey-overlay-title="Run an Application" { spawn "/usr/bin/fuzzel"; }
+    Mod+A hotkey-overlay-title="Run an Application" { spawn "/usr/bin/vicinae" "toggle"; }
+    Mod+X hotkey-overlay-title="Open a browser: zen" { spawn "/usr/bin/google-chrome-stable"; }
+    // Mod+D hotkey-overlay-title="同步切换obs和mpv状态" { spawn "/usr/bin/touch" "/tmp/obs_mpv_toggle_pause"; }
+    Mod+K hotkey-overlay-title="打开screenkey" { spawn "/usr/bin/wshowkeys" "-a" "right" "-a" "bottom" "-F" "ComicShannsMono Nerd Font 30"; }
+    Mod+Shift+K hotkey-overlay-title="关闭screenkey" { spawn "/usr/bin/killall" "wshowkeys"; }
+    // Mod+Shift+C hotkey-overlay-title="重启waybar" { spawn-sh "pkill waybar && waybar"; }
+
+    // 音量控制 allow-when-locked=true 在锁屏时的按键也会生效。这里的wpctl是wireplumber包中附带的
+    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
+    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
+
+    // 亮度控制。brightnessctl 有独立的包
+    XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "set" "+10%"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "10%-"; }
+
+    // 开关overview
+    Mod+Tab repeat=false { toggle-overview; }
+    // 关闭窗口
+    Mod+Q repeat=false { close-window; }
+
+    // 窗口焦点切换，位置移动
+    Mod+Left  { focus-column-left; }
+    Mod+Down  { focus-window-down; }
+    Mod+Up    { focus-window-up; }
+    Mod+Right { focus-column-right; }
+    Mod+N     { focus-column-left; }
+    Mod+i     { focus-column-right; }
+    Mod+Alt+Left { consume-or-expel-window-left; }
+    Mod+Alt+Right {consume-or-expel-window-right; }
+    // Mod+N     { spawn-sh "niri msg action focus-column-left && niri msg action center-column"; }
+    // Mod+i     { spawn-sh "niri msg action focus-column-right && niri msg action center-column"; }
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+Down  { move-window-down; }
+    Mod+Shift+Up    { move-window-up; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+N     { move-column-left; }
+    Mod+Shift+I     { move-column-right; }
+
+    Mod+Home { focus-column-first; }
+    Mod+End  { focus-column-last; }
+    Mod+Shift+Home { move-column-to-first; }
+    Mod+Shift+End  { move-column-to-last; }
+
+    // workspace焦点切换，窗口在workspace之间移动
+    Mod+Page_Down      { focus-workspace-down; }
+    Mod+Page_Up        { focus-workspace-up; }
+    Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
+    Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
+    // 上下移动整个workspace
+    Mod+Shift+Page_Down { move-workspace-down; }
+    Mod+Shift+Page_Up   { move-workspace-up; }
+
+    // 上下方向共用的窗口、工作空间的焦点切换和位置移动
+    Mod+E     { focus-window-or-workspace-down; }
+    Mod+U     { focus-window-or-workspace-up; }
+    Mod+Shift+E     { move-window-down-or-to-workspace-down; }
+    Mod+Shift+U     { move-window-up-or-to-workspace-up; }
+
+    // 显示器焦点切换
+    Mod+Ctrl+Left  { focus-monitor-left; }
+    Mod+Ctrl+Down  { focus-monitor-down; }
+    Mod+Ctrl+Up    { focus-monitor-up; }
+    Mod+Ctrl+Right { focus-monitor-right; }
+    Mod+Ctrl+N     { focus-monitor-left; }
+    Mod+Ctrl+E     { focus-monitor-down; }
+    Mod+Ctrl+U     { focus-monitor-up; }
+    Mod+Ctrl+I     { focus-monitor-right; }
+
+    // 跨显示器移动窗口
+    Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
