@@ -433,3 +433,90 @@ hotkey-overlay {
 // 设置截图保存的路径，null将会禁止保存到磁盘
 screenshot-path "~/Pictures/ScreenShot/%Y-%m-%d %H-%M-%S.png"
 
+// 忽略软件自带的装饰(例如标题栏)
+prefer-no-csd
+
+// 指定光标的主题和大小，打字时隐藏光标
+cursor {
+    // xcursor-theme "Dracula-cursors"
+    xcursor-theme "breeze"
+    xcursor-size 24
+    hide-when-typing
+}
+
+// 使用`niri msg windows`查看Title和App ID等信息
+window-rule {
+    open-on-output "eDP-2"
+    // default-window-height { proportion 0.9; }
+    // default-floating-position x=100 y=200 relative-to="bottom-left"
+    // default-column-width { proportion 0.7556; }
+    geometry-corner-radius 20 
+    clip-to-geometry true
+    border {
+        // off
+        on
+        width 4
+        active-gradient from="#bd93f9" to="#94b9fa" angle=135
+        inactive-color "#505050"
+        urgent-color "#9b0000"
+        // active-gradient from="#80c8ff" to="#bbddff" angle=45
+        // inactive-gradient from="#505050" to="#808080" angle=45 relative-to="workspace-view"
+        // urgent-gradient from="#800" to="#a33" angle=45
+    }
+
+    focus-ring{
+        off
+    }
+    // opacity 0.75
+}
+window-rule {
+    open-on-output "eDP-2"
+    match app-id="scrcpy"
+    default-column-width { proportion 0.2444; }
+}
+window-rule {
+    open-on-output "eDP-2"
+    match app-id=r#"chrome"#
+    default-column-width { proportion 0.8; }
+    // border {
+    //    on
+    //    width 4
+    //    active-color "#61AFEF"
+    // }
+    // open-focused false
+}
+window-rule {
+    match app-id="com.gabm.satty" title="satty"
+    border {
+        on
+        width 2
+        active-color "#61AFEF"
+    }
+}
+
+// `niri msg layers`显示有namespace可以在这里配置waybar透明度
+layer-rule {
+    match namespace="^quickshell-overview$"
+    place-within-backdrop true
+    //     opacity 0.75
+}
+
+// Put swaybg inside the overview backdrop.
+layer-rule {
+    match namespace="^wallpaper$"
+    place-within-backdrop true
+}
+
+debug {
+    honor-xdg-activation-with-invalid-serial
+}
+// 禁用鼠标左上角热脚
+gestures {
+    hot-corners {
+        // off
+    }
+}
+
+animations {
+    // Uncomment to turn off all animations.
+    // You can also put "off" into each individual animation to disable it.
