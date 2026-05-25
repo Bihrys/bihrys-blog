@@ -607,3 +607,90 @@ animations {
 ```ts
 // 要运行shell命令（带有变量，管道等），请使用spawn-sh-at-at-startup：
 spawn-sh-at-startup "swaybg -i /path/to/your/wallpaper.png -m fill"
+```
+
+这一行请务必填入自己的壁纸位置，否则壁纸是灰的！
+
+:::note
+本配置使用 `swaybg` 接管壁纸，所以无需在 Noctalia Shell 里面设置壁纸。
+:::
+
+## 修改 Hyprlock 配置文件
+
+~~（我喜欢混搭）~~
+
+```
+~/.config/hypr
+├── hyprlock.conf
+└── mocha
+    └── mocha.conf
+```
+
+请创建如上所示的目录结构，即运行
+``` sh
+mkdir ~/.config/hypr
+mkdir ~/.config/hypr/mocha
+touch ~/.config/hypr/hyprlock.conf
+touch ~/.config/hypr/mocha/mocha.conf
+```
+
+请编辑 `~/.config/hypr/hyprlock.conf`，填入以下配置：
+
+```ini
+source = $HOME/.config/hypr/mocha/mocha.conf
+
+$accent = $mauve
+$accentAlpha = $mauveAlpha
+$font = JetBrains Mono
+
+# GENERAL
+general {
+  hide_cursor = true
+}
+
+# BACKGROUND
+background {
+  monitor =
+  path = /path/to/your/lock/screen/wallpaper.png
+  blur_passes = 2
+  color = $base
+}
+
+# LAYOUT
+label {
+  monitor =
+  text = 键盘布局: $LAYOUT
+  color = $text
+  font_size = 25
+  font_family = $font
+  position = 30, -30
+  halign = left
+  valign = top
+}
+
+# TIME
+label {
+  monitor =
+  text = $TIME
+  color = $text
+  font_size = 90
+  font_family = $font
+  position = -30, 0
+  halign = right
+  valign = top
+}
+
+# DATE
+label {
+  monitor =
+  text = cmd[update:43200000] date +"%Y年 %m月 %d日, %A"
+  color = $text
+  font_size = 25
+  font_family = $font
+  position = -30, -150
+  halign = right
+  valign = top
+}
+
+# FINGERPRINT
+{
