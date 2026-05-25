@@ -520,3 +520,90 @@ gestures {
 animations {
     // Uncomment to turn off all animations.
     // You can also put "off" into each individual animation to disable it.
+    // off
+
+    // Slow down all animations by this factor. Values below 1 speed them up instead.
+    // slowdown 3.0
+
+    // Individual animations.
+
+    workspace-switch {
+        spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
+    }
+
+    window-open {
+        duration-ms 150
+        curve "ease-out-expo"
+    }
+
+    window-close {
+        duration-ms 150
+        curve "ease-out-quad"
+    }
+
+    horizontal-view-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+
+    window-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+
+    window-resize {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+
+    config-notification-open-close {
+        spring damping-ratio=0.6 stiffness=1000 epsilon=0.001
+    }
+
+    exit-confirmation-open-close {
+        spring damping-ratio=0.6 stiffness=500 epsilon=0.01
+    }
+
+    screenshot-ui-open {
+        duration-ms 200
+        curve "ease-out-quad"
+    }
+
+    overview-open-close {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+}
+
+
+```
+
+这里面热键配置部分的 `Mod` 在 SDDM 启动的 Niri 下全部代指 Super 键（也就是印刷着 Windows 徽标的那个键）。
+
+以下是几个常用热键：
+
+|  热键  |  功能  |
+|-------|--------|
+|Mod + Shift + /(?) | 显示热键菜单 |
+|Mod + A | 打开 Vicinae (App 启动器) |
+|Mod + D | 打开 Dolphin（文件管理器） |
+|Mod + X | 打开 `google-chrome-stable` |
+|Mod + Enter | 打开 Konsole （终端）|
+|Mod + R | 在预设的列宽中切换 |
+|Mod + Shift + R | 在预设的列高中切换 |
+|Mod + F | 将当前列的宽度扩展到最大 |
+|Mod + L | 用 Hyprlock 锁屏 |
+|Mod + 左右箭头 | 切换窗口左右焦点 |
+|Mod + Shift + 左右箭头| 将当前列和左右列互换位置 |
+|Mod + Alt + 左右箭头| 将该窗口吸收进左右列中或从当前列释放出去 |
+|Mod + PgUp / PgDn| 上下切换工作区 |
+|Mod + Ctrl + PgUp / PgDn | 将当前列移动到上下工作区 |
+|Mod + Tab| 进入 Overview （缩小整个屏幕以显示工作区概览） |
+|PrtSc| 截屏并复制到剪贴板以及保存到 ~ |
+|Ctrl + PrtSc | 截全屏，操作同上 |
+|三指滑动触摸板| 切换窗口以及工作区 |
+|四指滑动触摸板| 操作同 Mod + Tab|
+
+还有不少热键，懒得打了，看上面的配置吧。个人用得比较多的就这几个了。
+
+注意：
+
+```ts
+// 要运行shell命令（带有变量，管道等），请使用spawn-sh-at-at-startup：
+spawn-sh-at-startup "swaybg -i /path/to/your/wallpaper.png -m fill"
