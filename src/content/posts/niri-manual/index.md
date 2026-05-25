@@ -694,3 +694,90 @@ label {
 
 # FINGERPRINT
 {
+  monitor = "";
+  text = "$FPRINTPROMPT";
+  color = "$text";
+  font_size = 14;
+  font_family = $font;
+  position = "0, -107";
+  halign = "center";
+  valign = "center";
+}
+
+# USER AVATAR
+image {
+  monitor =
+  path = $HOME/.face
+  # size = 100
+  size = 200
+  border_color = $accent
+  position = 0, 90
+  # position = 0, 75
+  halign = center
+  valign = center
+}
+
+# INPUT FIELD
+input-field {
+  monitor =
+  size = 300, 60
+  outline_thickness = 4
+  dots_size = 0.2
+  dots_spacing = 0.2
+  dots_center = true
+  outer_color = $accent
+  inner_color = $surface0
+  font_color = $text
+  fade_on_empty = false
+  # placeholder_text = <span foreground="##$textAlpha"><i>󰌾 Logged in as </i><span foreground="##$accentAlpha">$USER</span></span>
+  placeholder_text = <span foreground="##$textAlpha">󰌾 <span foreground="##$accentAlpha">$USER</span> 已登录 </span>
+  hide_input = false
+  check_color = $accent
+  fail_color = $red
+  fail_text = <i> 已失败 <b>($ATTEMPTS)</b> 次 </i>
+  capslock_color = $yellow
+  # position = 0, -47
+  position = 0, -80
+  halign = center
+  valign = center
+
+
+```
+
+请在
+
+```ini
+# BACKGROUND
+background {
+  monitor =
+  path = /path/to/your/lock/screen/wallpaper.png
+  blur_passes = 0
+  color = $base
+}
+```
+填入锁屏壁纸的位置。
+
+并请复制一份你的头像到 `~/.face`。（注意：是创建一个`.face`文件，而不是在 `.face` 文件夹里面放上自己的头像图片！）
+
+
+编辑 `~/.config/hypr/mocha/mocha.conf`，填入以下配置：
+
+```ini
+$rosewater = rgb(f5e0dc)
+$rosewaterAlpha = f5e0dc
+
+$flamingo = rgb(f2cdcd)
+$flamingoAlpha = f2cdcd
+
+$pink = rgb(f5c2e7)
+$pinkAlpha = f5c2e7
+
+$mauve = rgb(cba6f7)
+$mauveAlpha = cba6f7
+
+$red = rgb(f38ba8)
+$redAlpha = f38ba8
+
+$maroon = rgb(eba0ac)
+$maroonAlpha = eba0ac
+
