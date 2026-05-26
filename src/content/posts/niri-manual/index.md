@@ -868,3 +868,90 @@ touch ~/.config/alacritty/alacritty.toml
 [env]
 TERM = "xterm-256color"
 
+[general]
+live_config_reload = true
+import = ["~/.config/alacritty/catppuccin/catppuccin-mocha.toml"]
+
+[window]
+decorations = "buttonless"
+dynamic_padding = false
+opacity = 1.0
+
+[window.padding]
+x = 25
+y = 20
+
+[font]
+size = 12.0
+
+[font.bold]
+family = "JetBrains Mono"
+style = "Heavy"
+
+[font.bold_italic]
+family = "JetBrains Mono"
+style = "Heavy Italic"
+
+[font.italic]
+family = "JetBrains Mono"
+style = "Medium Italic"
+
+[font.normal]
+family = "JetBrains Mono"
+style = "Medium"
+
+```
+
+
+## 配置 SDDM 自动登录
+
+上面 Niri 配置中我们写到了
+```ts
+spawn-at-startup "/usr/bin/hyprlock"
+```
+
+为了跳过 SDDM 之后仍保证系统安全，这里会在启动 Niri 时自动锁屏。所以我们现在来配置 SDDM 自动登录。
+
+编辑 `/etc/sddm.conf.d/autologin.conf` ，在里面加入：
+```ini
+[Autologin]
+User=#your_username
+Session=niri
+```
+
+请将 `#your_username` 改成你的用户名。
+
+## 重启，拥抱 Niri!
+
+不出意外的话，重启之后，输入密码，你就能看到 Noctalia Shell 的欢迎界面了！
+
+拥抱 Niri 吧！拥抱一个比 KDE Plasma 占用少得多且美观的 WM ！
+
+# 疑难解答
+
+由于我是中途从 KDE 转向了 Niri 而非全新安装，所以这篇教程很有可能有软件包依赖以及其他大大小小的问题。如果遇到了问题，欢迎在评论区提出！
+
+## 为什么我的输入法在 QQ 里面坏掉了？
+
+你需要创建 `~/.config/qq-flags.conf`，在里面填入
+
+```ini
+--ozone-platform=wayland
+--enable-wayland-ime
+--wayland-text-input-version=3
+```
+
+## 为什么右上角的应用图标这么丑？
+
+我不到啊我也很难受！我会想办法的（跪）
+
+## 为什么有些 GTK 软件是亮色的？这与我的主题不搭！
+```sh
+dconf write /org/gnome/desktop/interface/color-scheme '"prefer-dark"'
+```
+
+## ... ？
+留言吧求求了！！
+
+# 最后
+
