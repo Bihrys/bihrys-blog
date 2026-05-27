@@ -955,3 +955,9 @@ dconf write /org/gnome/desktop/interface/color-scheme '"prefer-dark"'
 
 # 最后
 
+```sh
+sudo pacman -S fastfetch hyfetch
+hyfetch
+```
+
+盯着你的电脑屏幕看几分钟，享受你的艺术品吧！
