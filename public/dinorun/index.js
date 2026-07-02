@@ -172,3 +172,90 @@
         },
         HDPI: {
             CACTUS_LARGE: { x: 652, y: 2 },
+            CACTUS_SMALL: { x: 446, y: 2 },
+            CLOUD: { x: 166, y: 2 },
+            HORIZON: { x: 2, y: 104 },
+            MOON: { x: 954, y: 2 },
+            PTERODACTYL: { x: 260, y: 2 },
+            RESTART: { x: 2, y: 2 },
+            TEXT_SPRITE: { x: 1294, y: 2 },
+            TREX: { x: 1678, y: 2 },
+            STAR: { x: 1276, y: 2 }
+        }
+    };
+
+
+    /**
+     * Sound FX. Reference to the ID of the audio tag on interstitial page.
+     * @enum {string}
+     */
+    Runner.sounds = {
+        BUTTON_PRESS: 'offline-sound-press',
+        HIT: 'offline-sound-hit',
+        SCORE: 'offline-sound-reached'
+    };
+
+
+    /**
+     * Key code mapping.
+     * @enum {Object}
+     */
+    Runner.keycodes = {
+        JUMP: { '38': 1, '32': 1 },  // Up, spacebar
+        DUCK: { '40': 1 },  // Down
+        RESTART: { '13': 1 }  // Enter
+    };
+
+
+    /**
+     * Runner event names.
+     * @enum {string}
+     */
+    Runner.events = {
+        ANIM_END: 'webkitAnimationEnd',
+        CLICK: 'click',
+        KEYDOWN: 'keydown',
+        KEYUP: 'keyup',
+        MOUSEDOWN: 'mousedown',
+        MOUSEUP: 'mouseup',
+        RESIZE: 'resize',
+        TOUCHEND: 'touchend',
+        TOUCHSTART: 'touchstart',
+        VISIBILITY: 'visibilitychange',
+        BLUR: 'blur',
+        FOCUS: 'focus',
+        LOAD: 'load'
+    };
+
+
+    Runner.prototype = {
+        /**
+         * Whether the easter egg has been disabled. CrOS enterprise enrolled devices.
+         * @return {boolean}
+         */
+        isDisabled: function () {
+            // return loadTimeData && loadTimeData.valueExists('disabledEasterEgg');
+            return false;
+        },
+
+        /**
+         * For disabled instances, set up a snackbar with the disabled message.
+         */
+        setupDisabledRunner: function () {
+            this.containerEl = document.createElement('div');
+            this.containerEl.className = Runner.classes.SNACKBAR;
+            this.containerEl.textContent = loadTimeData.getValue('disabledEasterEgg');
+            this.outerContainerEl.appendChild(this.containerEl);
+
+            // Show notification when the activation key is pressed.
+            document.addEventListener(Runner.events.KEYDOWN, function (e) {
+                if (Runner.keycodes.JUMP[e.keyCode]) {
+                    this.containerEl.classList.add(Runner.classes.SNACKBAR_SHOW);
+                    document.querySelector('.icon').classList.add('icon-disabled');
+                }
+            }.bind(this));
+        },
+
+        /**
+         * Setting individual settings for debugging.
+         * @param {string} setting
