@@ -259,3 +259,90 @@
         /**
          * Setting individual settings for debugging.
          * @param {string} setting
+         * @param {*} value
+         */
+        updateConfigSetting: function (setting, value) {
+            if (setting in this.config && value != undefined) {
+                this.config[setting] = value;
+
+                switch (setting) {
+                    case 'GRAVITY':
+                    case 'MIN_JUMP_HEIGHT':
+                    case 'SPEED_DROP_COEFFICIENT':
+                        this.tRex.config[setting] = value;
+                        break;
+                    case 'INITIAL_JUMP_VELOCITY':
+                        this.tRex.setJumpVelocity(value);
+                        break;
+                    case 'SPEED':
+                        this.setSpeed(value);
+                        break;
+                }
+            }
+        },
+
+        /**
+         * Cache the appropriate image sprite from the page and get the sprite sheet
+         * definition.
+         */
+        loadImages: function () {
+            if (IS_HIDPI) {
+                Runner.imageSprite = document.getElementById('offline-resources-2x');
+                this.spriteDef = Runner.spriteDefinition.HDPI;
+            } else {
+                Runner.imageSprite = document.getElementById('offline-resources-1x');
+                this.spriteDef = Runner.spriteDefinition.LDPI;
+            }
+
+            if (Runner.imageSprite.complete) {
+                this.init();
+            } else {
+                // If the images are not yet loaded, add a listener.
+                Runner.imageSprite.addEventListener(Runner.events.LOAD,
+                    this.init.bind(this));
+            }
+        },
+
+        /**
+         * Load and decode base 64 encoded sounds.
+         */
+        loadSounds: function () {
+            if (!IS_IOS) {
+                this.audioContext = new AudioContext();
+
+                var resourceTemplate =
+                    document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content;
+
+                for (var sound in Runner.sounds) {
+                    var soundSrc =
+                        resourceTemplate.getElementById(Runner.sounds[sound]).src;
+                    soundSrc = soundSrc.substr(soundSrc.indexOf(',') + 1);
+                    var buffer = decodeBase64ToArrayBuffer(soundSrc);
+
+                    // Async, so no guarantee of order in array.
+                    this.audioContext.decodeAudioData(buffer, function (index, audioData) {
+                        this.soundFx[index] = audioData;
+                    }.bind(this, sound));
+                }
+            }
+        },
+
+        /**
+         * Sets the game speed. Adjust the speed accordingly if on a smaller screen.
+         * @param {number} opt_speed
+         */
+        setSpeed: function (opt_speed) {
+            var speed = opt_speed || this.currentSpeed;
+
+            // Reduce the speed on smaller mobile screens.
+            if (this.dimensions.WIDTH < DEFAULT_WIDTH) {
+                var mobileSpeed = speed * this.dimensions.WIDTH / DEFAULT_WIDTH *
+                    this.config.MOBILE_SPEED_COEFFICIENT;
+                this.currentSpeed = mobileSpeed > speed ? speed : mobileSpeed;
+            } else if (opt_speed) {
+                this.currentSpeed = opt_speed;
+            }
+        },
+
+        /**
+         * Game initialiser.
