@@ -346,3 +346,90 @@
 
         /**
          * Game initialiser.
+         */
+        init: function () {
+            // Hide the static icon.
+            document.querySelector('.' + Runner.classes.ICON).style.visibility =
+                'hidden';
+
+            this.adjustDimensions();
+            this.setSpeed();
+
+            this.containerEl = document.createElement('div');
+            this.containerEl.className = Runner.classes.CONTAINER;
+
+            // Player canvas container.
+            this.canvas = createCanvas(this.containerEl, this.dimensions.WIDTH,
+                this.dimensions.HEIGHT, Runner.classes.PLAYER);
+
+            this.canvasCtx = this.canvas.getContext('2d');
+            this.canvasCtx.fillStyle = '#f7f7f7';
+            this.canvasCtx.fill();
+            Runner.updateCanvasScaling(this.canvas);
+
+            // Horizon contains clouds, obstacles and the ground.
+            this.horizon = new Horizon(this.canvas, this.spriteDef, this.dimensions,
+                this.config.GAP_COEFFICIENT);
+
+            // Distance meter
+            this.distanceMeter = new DistanceMeter(this.canvas,
+                this.spriteDef.TEXT_SPRITE, this.dimensions.WIDTH);
+
+            // Draw t-rex
+            this.tRex = new Trex(this.canvas, this.spriteDef.TREX);
+
+            this.outerContainerEl.appendChild(this.containerEl);
+
+            if (IS_MOBILE) {
+                this.createTouchController();
+            }
+
+            this.startListening();
+            this.update();
+
+            window.addEventListener(Runner.events.RESIZE,
+                this.debounceResize.bind(this));
+        },
+
+        /**
+         * Create the touch controller. A div that covers whole screen.
+         */
+        createTouchController: function () {
+            this.touchController = document.createElement('div');
+            this.touchController.className = Runner.classes.TOUCH_CONTROLLER;
+            this.outerContainerEl.appendChild(this.touchController);
+        },
+
+        /**
+         * Debounce the resize event.
+         */
+        debounceResize: function () {
+            if (!this.resizeTimerId_) {
+                this.resizeTimerId_ =
+                    setInterval(this.adjustDimensions.bind(this), 250);
+            }
+        },
+
+        /**
+         * Adjust game space dimensions on resize.
+         */
+        adjustDimensions: function () {
+            clearInterval(this.resizeTimerId_);
+            this.resizeTimerId_ = null;
+
+            var boxStyles = window.getComputedStyle(this.outerContainerEl);
+            var padding = Number(boxStyles.paddingLeft.substr(0,
+                boxStyles.paddingLeft.length - 2));
+
+            this.dimensions.WIDTH = this.outerContainerEl.offsetWidth - padding * 2;
+
+            // Redraw the elements back onto the canvas.
+            if (this.canvas) {
+                this.canvas.width = this.dimensions.WIDTH;
+                this.canvas.height = this.dimensions.HEIGHT;
+
+                Runner.updateCanvasScaling(this.canvas);
+
+                this.distanceMeter.calcXPos(this.dimensions.WIDTH);
+                this.clearCanvas();
+                this.horizon.update(0, 0, true);
