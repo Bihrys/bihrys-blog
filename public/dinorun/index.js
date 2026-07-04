@@ -955,3 +955,90 @@
      * @return {HTMLCanvasElement}
      */
     function createCanvas(container, width, height, opt_classname) {
+        var canvas = document.createElement('canvas');
+        canvas.className = opt_classname ? Runner.classes.CANVAS + ' ' +
+            opt_classname : Runner.classes.CANVAS;
+        canvas.width = width;
+        canvas.height = height;
+        container.appendChild(canvas);
+
+        return canvas;
+    }
+
+
+    /**
+     * Decodes the base 64 audio to ArrayBuffer used by Web Audio.
+     * @param {string} base64String
+     */
+    function decodeBase64ToArrayBuffer(base64String) {
+        var len = (base64String.length / 4) * 3;
+        var str = atob(base64String);
+        var arrayBuffer = new ArrayBuffer(len);
+        var bytes = new Uint8Array(arrayBuffer);
+
+        for (var i = 0; i < len; i++) {
+            bytes[i] = str.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
+
+
+    /**
+     * Return the current timestamp.
+     * @return {number}
+     */
+    function getTimeStamp() {
+        return IS_IOS ? new Date().getTime() : performance.now();
+    }
+
+
+    //******************************************************************************
+
+
+    /**
+     * Game over panel.
+     * @param {!HTMLCanvasElement} canvas
+     * @param {Object} textImgPos
+     * @param {Object} restartImgPos
+     * @param {!Object} dimensions Canvas dimensions.
+     * @constructor
+     */
+    function GameOverPanel(canvas, textImgPos, restartImgPos, dimensions) {
+        this.canvas = canvas;
+        this.canvasCtx = canvas.getContext('2d');
+        this.canvasDimensions = dimensions;
+        this.textImgPos = textImgPos;
+        this.restartImgPos = restartImgPos;
+        this.draw();
+    };
+
+
+    /**
+     * Dimensions used in the panel.
+     * @enum {number}
+     */
+    GameOverPanel.dimensions = {
+        TEXT_X: 0,
+        TEXT_Y: 13,
+        TEXT_WIDTH: 191,
+        TEXT_HEIGHT: 11,
+        RESTART_WIDTH: 36,
+        RESTART_HEIGHT: 32
+    };
+
+
+    GameOverPanel.prototype = {
+        /**
+         * Update the panel dimensions.
+         * @param {number} width New canvas width.
+         * @param {number} opt_height Optional new canvas height.
+         */
+        updateDimensions: function (width, opt_height) {
+            this.canvasDimensions.WIDTH = width;
+            if (opt_height) {
+                this.canvasDimensions.HEIGHT = opt_height;
+            }
+        },
+
+        /**
+         * Draw the panel.
