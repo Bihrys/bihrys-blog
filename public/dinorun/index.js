@@ -607,3 +607,90 @@
          */
         handleEvent: function (e) {
             return (function (evtType, events) {
+                switch (evtType) {
+                    case events.KEYDOWN:
+                    case events.TOUCHSTART:
+                    case events.MOUSEDOWN:
+                        this.onKeyDown(e);
+                        break;
+                    case events.KEYUP:
+                    case events.TOUCHEND:
+                    case events.MOUSEUP:
+                        this.onKeyUp(e);
+                        break;
+                }
+            }.bind(this))(e.type, Runner.events);
+        },
+
+        /**
+         * Bind relevant key / mouse / touch listeners.
+         */
+        startListening: function () {
+            // Keys.
+            document.addEventListener(Runner.events.KEYDOWN, this);
+            document.addEventListener(Runner.events.KEYUP, this);
+
+            if (IS_MOBILE) {
+                // Mobile only touch devices.
+                this.touchController.addEventListener(Runner.events.TOUCHSTART, this);
+                this.touchController.addEventListener(Runner.events.TOUCHEND, this);
+                this.containerEl.addEventListener(Runner.events.TOUCHSTART, this);
+            } else {
+                // Mouse.
+                document.addEventListener(Runner.events.MOUSEDOWN, this);
+                document.addEventListener(Runner.events.MOUSEUP, this);
+            }
+        },
+
+        /**
+         * Remove all listeners.
+         */
+        stopListening: function () {
+            document.removeEventListener(Runner.events.KEYDOWN, this);
+            document.removeEventListener(Runner.events.KEYUP, this);
+
+            if (IS_MOBILE) {
+                this.touchController.removeEventListener(Runner.events.TOUCHSTART, this);
+                this.touchController.removeEventListener(Runner.events.TOUCHEND, this);
+                this.containerEl.removeEventListener(Runner.events.TOUCHSTART, this);
+            } else {
+                document.removeEventListener(Runner.events.MOUSEDOWN, this);
+                document.removeEventListener(Runner.events.MOUSEUP, this);
+            }
+        },
+
+        /**
+         * Process keydown.
+         * @param {Event} e
+         */
+        onKeyDown: function (e) {
+            // Prevent native page scrolling whilst tapping on mobile.
+            if (IS_MOBILE && this.playing) {
+                e.preventDefault();
+            }
+
+            if (e.target != this.detailsButton) {
+                if (!this.crashed && (Runner.keycodes.JUMP[e.keyCode] ||
+                    e.type == Runner.events.TOUCHSTART)) {
+                    if (!this.playing) {
+                        this.loadSounds();
+                        this.playing = true;
+                        this.update();
+                        if (window.errorPageController) {
+                            errorPageController.trackEasterEgg();
+                        }
+                    }
+                    //  Play sound effect and jump on starting the game for the first time.
+                    if (!this.tRex.jumping && !this.tRex.ducking) {
+                        this.playSound(this.soundFx.BUTTON_PRESS);
+                        this.tRex.startJump(this.currentSpeed);
+                    }
+                }
+
+                if (this.crashed && e.type == Runner.events.TOUCHSTART &&
+                    e.currentTarget == this.containerEl) {
+                    this.restart();
+                }
+            }
+
+            if (this.playing && !this.crashed && Runner.keycodes.DUCK[e.keyCode]) {
