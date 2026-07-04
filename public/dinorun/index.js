@@ -694,3 +694,90 @@
             }
 
             if (this.playing && !this.crashed && Runner.keycodes.DUCK[e.keyCode]) {
+                e.preventDefault();
+                if (this.tRex.jumping) {
+                    // Speed drop, activated only when jump key is not pressed.
+                    this.tRex.setSpeedDrop();
+                } else if (!this.tRex.jumping && !this.tRex.ducking) {
+                    // Duck.
+                    this.tRex.setDuck(true);
+                }
+            }
+        },
+
+
+        /**
+         * Process key up.
+         * @param {Event} e
+         */
+        onKeyUp: function (e) {
+            var keyCode = String(e.keyCode);
+            var isjumpKey = Runner.keycodes.JUMP[keyCode] ||
+                e.type == Runner.events.TOUCHEND ||
+                e.type == Runner.events.MOUSEDOWN;
+
+            if (this.isRunning() && isjumpKey) {
+                this.tRex.endJump();
+            } else if (Runner.keycodes.DUCK[keyCode]) {
+                this.tRex.speedDrop = false;
+                this.tRex.setDuck(false);
+            } else if (this.crashed) {
+                // Check that enough time has elapsed before allowing jump key to restart.
+                var deltaTime = getTimeStamp() - this.time;
+
+                if (Runner.keycodes.RESTART[keyCode] || this.isLeftClickOnCanvas(e) ||
+                    (deltaTime >= this.config.GAMEOVER_CLEAR_TIME &&
+                        Runner.keycodes.JUMP[keyCode])) {
+                    this.restart();
+                }
+            } else if (this.paused && isjumpKey) {
+                // Reset the jump state
+                this.tRex.reset();
+                this.play();
+            }
+        },
+
+        /**
+         * Returns whether the event was a left click on canvas.
+         * On Windows right click is registered as a click.
+         * @param {Event} e
+         * @return {boolean}
+         */
+        isLeftClickOnCanvas: function (e) {
+            return e.button != null && e.button < 2 &&
+                e.type == Runner.events.MOUSEUP && e.target == this.canvas;
+        },
+
+        /**
+         * RequestAnimationFrame wrapper.
+         */
+        scheduleNextUpdate: function () {
+            if (!this.updatePending) {
+                this.updatePending = true;
+                this.raqId = requestAnimationFrame(this.update.bind(this));
+            }
+        },
+
+        /**
+         * Whether the game is running.
+         * @return {boolean}
+         */
+        isRunning: function () {
+            return !!this.raqId;
+        },
+
+        /**
+         * Game over state.
+         */
+        gameOver: function () {
+            this.playSound(this.soundFx.HIT);
+            vibrate(200);
+
+            this.stop();
+            this.crashed = true;
+            this.distanceMeter.acheivement = false;
+
+            this.tRex.update(100, Trex.status.CRASHED);
+
+            // Game over panel.
+            if (!this.gameOverPanel) {
