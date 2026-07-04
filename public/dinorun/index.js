@@ -868,3 +868,90 @@
         invert: function (reset) {
             if (reset) {
                 document.getElementById("t").classList.toggle(Runner.classes.INVERTED, false);
+                this.invertTimer = 0;
+                this.inverted = false;
+            } else {
+                this.inverted = document.getElementById("t").classList.toggle(Runner.classes.INVERTED,
+                    this.invertTrigger);
+            }
+        }
+    };
+
+
+    /**
+     * Updates the canvas size taking into
+     * account the backing store pixel ratio and
+     * the device pixel ratio.
+     *
+     * See article by Paul Lewis:
+     * http://www.html5rocks.com/en/tutorials/canvas/hidpi/
+     *
+     * @param {HTMLCanvasElement} canvas
+     * @param {number} opt_width
+     * @param {number} opt_height
+     * @return {boolean} Whether the canvas was scaled.
+     */
+    Runner.updateCanvasScaling = function (canvas, opt_width, opt_height) {
+        var context = canvas.getContext('2d');
+
+        // Query the various pixel ratios
+        var devicePixelRatio = Math.floor(window.devicePixelRatio) || 1;
+        var backingStoreRatio = Math.floor(context.webkitBackingStorePixelRatio) || 1;
+        var ratio = devicePixelRatio / backingStoreRatio;
+
+        // Upscale the canvas if the two ratios don't match
+        if (devicePixelRatio !== backingStoreRatio) {
+            var oldWidth = opt_width || canvas.width;
+            var oldHeight = opt_height || canvas.height;
+
+            canvas.width = oldWidth * ratio;
+            canvas.height = oldHeight * ratio;
+
+            canvas.style.width = oldWidth + 'px';
+            canvas.style.height = oldHeight + 'px';
+
+            // Scale the context to counter the fact that we've manually scaled
+            // our canvas element.
+            context.scale(ratio, ratio);
+            return true;
+        } else if (devicePixelRatio == 1) {
+            // Reset the canvas width / height. Fixes scaling bug when the page is
+            // zoomed and the devicePixelRatio changes accordingly.
+            canvas.style.width = canvas.width + 'px';
+            canvas.style.height = canvas.height + 'px';
+        }
+        return false;
+    };
+
+
+    /**
+     * Get random number.
+     * @param {number} min
+     * @param {number} max
+     * @param {number}
+     */
+    function getRandomNum(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+
+    /**
+     * Vibrate on mobile devices.
+     * @param {number} duration Duration of the vibration in milliseconds.
+     */
+    function vibrate(duration) {
+        if (IS_MOBILE && window.navigator.vibrate) {
+            window.navigator.vibrate(duration);
+        }
+    }
+
+
+    /**
+     * Create canvas element.
+     * @param {HTMLElement} container Element to append canvas to.
+     * @param {number} width
+     * @param {number} height
+     * @param {string} opt_classname
+     * @return {HTMLCanvasElement}
+     */
+    function createCanvas(container, width, height, opt_classname) {
