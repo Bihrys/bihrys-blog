@@ -1042,3 +1042,90 @@
 
         /**
          * Draw the panel.
+         */
+        draw: function () {
+            var dimensions = GameOverPanel.dimensions;
+
+            var centerX = this.canvasDimensions.WIDTH / 2;
+
+            // Game over text.
+            var textSourceX = dimensions.TEXT_X;
+            var textSourceY = dimensions.TEXT_Y;
+            var textSourceWidth = dimensions.TEXT_WIDTH;
+            var textSourceHeight = dimensions.TEXT_HEIGHT;
+
+            var textTargetX = Math.round(centerX - (dimensions.TEXT_WIDTH / 2));
+            var textTargetY = Math.round((this.canvasDimensions.HEIGHT - 25) / 3);
+            var textTargetWidth = dimensions.TEXT_WIDTH;
+            var textTargetHeight = dimensions.TEXT_HEIGHT;
+
+            var restartSourceWidth = dimensions.RESTART_WIDTH;
+            var restartSourceHeight = dimensions.RESTART_HEIGHT;
+            var restartTargetX = centerX - (dimensions.RESTART_WIDTH / 2);
+            var restartTargetY = this.canvasDimensions.HEIGHT / 2;
+
+            if (IS_HIDPI) {
+                textSourceY *= 2;
+                textSourceX *= 2;
+                textSourceWidth *= 2;
+                textSourceHeight *= 2;
+                restartSourceWidth *= 2;
+                restartSourceHeight *= 2;
+            }
+
+            textSourceX += this.textImgPos.x;
+            textSourceY += this.textImgPos.y;
+
+            // Game over text from sprite.
+            this.canvasCtx.drawImage(Runner.imageSprite,
+                textSourceX, textSourceY, textSourceWidth, textSourceHeight,
+                textTargetX, textTargetY, textTargetWidth, textTargetHeight);
+
+            // Restart button.
+            this.canvasCtx.drawImage(Runner.imageSprite,
+                this.restartImgPos.x, this.restartImgPos.y,
+                restartSourceWidth, restartSourceHeight,
+                restartTargetX, restartTargetY, dimensions.RESTART_WIDTH,
+                dimensions.RESTART_HEIGHT);
+        }
+    };
+
+
+    //******************************************************************************
+
+    /**
+     * Check for a collision.
+     * @param {!Obstacle} obstacle
+     * @param {!Trex} tRex T-rex object.
+     * @param {HTMLCanvasContext} opt_canvasCtx Optional canvas context for drawing
+     *    collision boxes.
+     * @return {Array<CollisionBox>}
+     */
+    function checkForCollision(obstacle, tRex, opt_canvasCtx) {
+        var obstacleBoxXPos = Runner.defaultDimensions.WIDTH + obstacle.xPos;
+
+        // Adjustments are made to the bounding box as there is a 1 pixel white
+        // border around the t-rex and obstacles.
+        var tRexBox = new CollisionBox(
+            tRex.xPos + 1,
+            tRex.yPos + 1,
+            tRex.config.WIDTH - 2,
+            tRex.config.HEIGHT - 2);
+
+        var obstacleBox = new CollisionBox(
+            obstacle.xPos + 1,
+            obstacle.yPos + 1,
+            obstacle.typeConfig.width * obstacle.size - 2,
+            obstacle.typeConfig.height - 2);
+
+        // Debug outer box
+        if (opt_canvasCtx) {
+            drawCollisionBoxes(opt_canvasCtx, tRexBox, obstacleBox);
+        }
+
+        // Simple outer bounds check.
+        if (boxCompare(tRexBox, obstacleBox)) {
+            var collisionBoxes = obstacle.collisionBoxes;
+            var tRexCollisionBoxes = tRex.ducking ?
+                Trex.collisionBoxes.DUCKING : Trex.collisionBoxes.RUNNING;
+
