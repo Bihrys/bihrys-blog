@@ -1129,3 +1129,90 @@
             var tRexCollisionBoxes = tRex.ducking ?
                 Trex.collisionBoxes.DUCKING : Trex.collisionBoxes.RUNNING;
 
+            // Detailed axis aligned box check.
+            for (var t = 0; t < tRexCollisionBoxes.length; t++) {
+                for (var i = 0; i < collisionBoxes.length; i++) {
+                    // Adjust the box to actual positions.
+                    var adjTrexBox =
+                        createAdjustedCollisionBox(tRexCollisionBoxes[t], tRexBox);
+                    var adjObstacleBox =
+                        createAdjustedCollisionBox(collisionBoxes[i], obstacleBox);
+                    var crashed = boxCompare(adjTrexBox, adjObstacleBox);
+
+                    // Draw boxes for debug.
+                    if (opt_canvasCtx) {
+                        drawCollisionBoxes(opt_canvasCtx, adjTrexBox, adjObstacleBox);
+                    }
+
+                    if (crashed) {
+                        return [adjTrexBox, adjObstacleBox];
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
+
+    /**
+     * Adjust the collision box.
+     * @param {!CollisionBox} box The original box.
+     * @param {!CollisionBox} adjustment Adjustment box.
+     * @return {CollisionBox} The adjusted collision box object.
+     */
+    function createAdjustedCollisionBox(box, adjustment) {
+        return new CollisionBox(
+            box.x + adjustment.x,
+            box.y + adjustment.y,
+            box.width,
+            box.height);
+    };
+
+
+    /**
+     * Draw the collision boxes for debug.
+     */
+    function drawCollisionBoxes(canvasCtx, tRexBox, obstacleBox) {
+        canvasCtx.save();
+        canvasCtx.strokeStyle = '#f00';
+        canvasCtx.strokeRect(tRexBox.x, tRexBox.y, tRexBox.width, tRexBox.height);
+
+        canvasCtx.strokeStyle = '#0f0';
+        canvasCtx.strokeRect(obstacleBox.x, obstacleBox.y,
+            obstacleBox.width, obstacleBox.height);
+        canvasCtx.restore();
+    };
+
+
+    /**
+     * Compare two collision boxes for a collision.
+     * @param {CollisionBox} tRexBox
+     * @param {CollisionBox} obstacleBox
+     * @return {boolean} Whether the boxes intersected.
+     */
+    function boxCompare(tRexBox, obstacleBox) {
+        var crashed = false;
+        var tRexBoxX = tRexBox.x;
+        var tRexBoxY = tRexBox.y;
+
+        var obstacleBoxX = obstacleBox.x;
+        var obstacleBoxY = obstacleBox.y;
+
+        // Axis-Aligned Bounding Box method.
+        if (tRexBox.x < obstacleBoxX + obstacleBox.width &&
+            tRexBox.x + tRexBox.width > obstacleBoxX &&
+            tRexBox.y < obstacleBox.y + obstacleBox.height &&
+            tRexBox.height + tRexBox.y > obstacleBox.y) {
+            crashed = true;
+        }
+
+        return crashed;
+    };
+
+
+    //******************************************************************************
+
+    /**
+     * Collision box object.
+     * @param {number} x X position.
+     * @param {number} y Y Position.
