@@ -1216,3 +1216,90 @@
      * Collision box object.
      * @param {number} x X position.
      * @param {number} y Y Position.
+     * @param {number} w Width.
+     * @param {number} h Height.
+     */
+    function CollisionBox(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+    };
+
+
+    //******************************************************************************
+
+    /**
+     * Obstacle.
+     * @param {HTMLCanvasCtx} canvasCtx
+     * @param {Obstacle.type} type
+     * @param {Object} spritePos Obstacle position in sprite.
+     * @param {Object} dimensions
+     * @param {number} gapCoefficient Mutipler in determining the gap.
+     * @param {number} speed
+     * @param {number} opt_xOffset
+     */
+    function Obstacle(canvasCtx, type, spriteImgPos, dimensions,
+        gapCoefficient, speed, opt_xOffset) {
+
+        this.canvasCtx = canvasCtx;
+        this.spritePos = spriteImgPos;
+        this.typeConfig = type;
+        this.gapCoefficient = gapCoefficient;
+        this.size = getRandomNum(1, Obstacle.MAX_OBSTACLE_LENGTH);
+        this.dimensions = dimensions;
+        this.remove = false;
+        this.xPos = dimensions.WIDTH + (opt_xOffset || 0);
+        this.yPos = 0;
+        this.width = 0;
+        this.collisionBoxes = [];
+        this.gap = 0;
+        this.speedOffset = 0;
+
+        // For animated obstacles.
+        this.currentFrame = 0;
+        this.timer = 0;
+
+        this.init(speed);
+    };
+
+    /**
+     * Coefficient for calculating the maximum gap.
+     * @const
+     */
+    Obstacle.MAX_GAP_COEFFICIENT = 1.5;
+
+    /**
+     * Maximum obstacle grouping count.
+     * @const
+     */
+    Obstacle.MAX_OBSTACLE_LENGTH = 3,
+
+
+        Obstacle.prototype = {
+            /**
+             * Initialise the DOM for the obstacle.
+             * @param {number} speed
+             */
+            init: function (speed) {
+                this.cloneCollisionBoxes();
+
+                // Only allow sizing if we're at the right speed.
+                if (this.size > 1 && this.typeConfig.multipleSpeed > speed) {
+                    this.size = 1;
+                }
+
+                this.width = this.typeConfig.width * this.size;
+
+                // Check if obstacle can be positioned at various heights.
+                if (Array.isArray(this.typeConfig.yPos)) {
+                    var yPosConfig = IS_MOBILE ? this.typeConfig.yPosMobile :
+                        this.typeConfig.yPos;
+                    this.yPos = yPosConfig[getRandomNum(0, yPosConfig.length - 1)];
+                } else {
+                    this.yPos = this.typeConfig.yPos;
+                }
+
+                this.draw();
+
+                // Make collision box adjustments,
