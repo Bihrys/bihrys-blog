@@ -1303,3 +1303,90 @@
                 this.draw();
 
                 // Make collision box adjustments,
+                // Central box is adjusted to the size as one box.
+                //      ____        ______        ________
+                //    _|   |-|    _|     |-|    _|       |-|
+                //   | |<->| |   | |<--->| |   | |<----->| |
+                //   | | 1 | |   | |  2  | |   | |   3   | |
+                //   |_|___|_|   |_|_____|_|   |_|_______|_|
+                //
+                if (this.size > 1) {
+                    this.collisionBoxes[1].width = this.width - this.collisionBoxes[0].width -
+                        this.collisionBoxes[2].width;
+                    this.collisionBoxes[2].x = this.width - this.collisionBoxes[2].width;
+                }
+
+                // For obstacles that go at a different speed from the horizon.
+                if (this.typeConfig.speedOffset) {
+                    this.speedOffset = Math.random() > 0.5 ? this.typeConfig.speedOffset :
+                        -this.typeConfig.speedOffset;
+                }
+
+                this.gap = this.getGap(this.gapCoefficient, speed);
+            },
+
+            /**
+             * Draw and crop based on size.
+             */
+            draw: function () {
+                var sourceWidth = this.typeConfig.width;
+                var sourceHeight = this.typeConfig.height;
+
+                if (IS_HIDPI) {
+                    sourceWidth = sourceWidth * 2;
+                    sourceHeight = sourceHeight * 2;
+                }
+
+                // X position in sprite.
+                var sourceX = (sourceWidth * this.size) * (0.5 * (this.size - 1)) +
+                    this.spritePos.x;
+
+                // Animation frames.
+                if (this.currentFrame > 0) {
+                    sourceX += sourceWidth * this.currentFrame;
+                }
+
+                this.canvasCtx.drawImage(Runner.imageSprite,
+                    sourceX, this.spritePos.y,
+                    sourceWidth * this.size, sourceHeight,
+                    this.xPos, this.yPos,
+                    this.typeConfig.width * this.size, this.typeConfig.height);
+            },
+
+            /**
+             * Obstacle frame update.
+             * @param {number} deltaTime
+             * @param {number} speed
+             */
+            update: function (deltaTime, speed) {
+                if (!this.remove) {
+                    if (this.typeConfig.speedOffset) {
+                        speed += this.speedOffset;
+                    }
+                    this.xPos -= Math.floor((speed * FPS / 1000) * deltaTime);
+
+                    // Update frame
+                    if (this.typeConfig.numFrames) {
+                        this.timer += deltaTime;
+                        if (this.timer >= this.typeConfig.frameRate) {
+                            this.currentFrame =
+                                this.currentFrame == this.typeConfig.numFrames - 1 ?
+                                    0 : this.currentFrame + 1;
+                            this.timer = 0;
+                        }
+                    }
+                    this.draw();
+
+                    if (!this.isVisible()) {
+                        this.remove = true;
+                    }
+                }
+            },
+
+            /**
+             * Calculate a random gap size.
+             * - Minimum gap gets wider as speed increses
+             * @param {number} gapCoefficient
+             * @param {number} speed
+             * @return {number} The gap size.
+             */
