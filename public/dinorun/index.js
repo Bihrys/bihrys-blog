@@ -1477,3 +1477,90 @@
             frameRate: 1000 / 6,
             speedOffset: .8
         }
+    ];
+
+
+    //******************************************************************************
+    /**
+     * T-rex game character.
+     * @param {HTMLCanvas} canvas
+     * @param {Object} spritePos Positioning within image sprite.
+     * @constructor
+     */
+    function Trex(canvas, spritePos) {
+        this.canvas = canvas;
+        this.canvasCtx = canvas.getContext('2d');
+        this.spritePos = spritePos;
+        this.xPos = 0;
+        this.yPos = 0;
+        // Position when on the ground.
+        this.groundYPos = 0;
+        this.currentFrame = 0;
+        this.currentAnimFrames = [];
+        this.blinkDelay = 0;
+        this.blinkCount = 0;
+        this.animStartTime = 0;
+        this.timer = 0;
+        this.msPerFrame = 1000 / FPS;
+        this.config = Trex.config;
+        // Current status.
+        this.status = Trex.status.WAITING;
+
+        this.jumping = false;
+        this.ducking = false;
+        this.jumpVelocity = 0;
+        this.reachedMinHeight = false;
+        this.speedDrop = false;
+        this.jumpCount = 0;
+        this.jumpspotX = 0;
+
+        this.init();
+    };
+
+
+    /**
+     * T-rex player config.
+     * @enum {number}
+     */
+    Trex.config = {
+        DROP_VELOCITY: -5,
+        GRAVITY: 0.6,
+        HEIGHT: 47,
+        HEIGHT_DUCK: 25,
+        INIITAL_JUMP_VELOCITY: -10,
+        INTRO_DURATION: 1500,
+        MAX_JUMP_HEIGHT: 30,
+        MIN_JUMP_HEIGHT: 30,
+        SPEED_DROP_COEFFICIENT: 3,
+        SPRITE_WIDTH: 262,
+        START_X_POS: 50,
+        WIDTH: 44,
+        WIDTH_DUCK: 59
+    };
+
+
+    /**
+     * Used in collision detection.
+     * @type {Array<CollisionBox>}
+     */
+    Trex.collisionBoxes = {
+        DUCKING: [
+            new CollisionBox(1, 18, 55, 25)
+        ],
+        RUNNING: [
+            new CollisionBox(22, 0, 17, 16),
+            new CollisionBox(1, 18, 30, 9),
+            new CollisionBox(10, 35, 14, 8),
+            new CollisionBox(1, 24, 29, 5),
+            new CollisionBox(5, 30, 21, 4),
+            new CollisionBox(9, 34, 15, 4)
+        ]
+    };
+
+
+    /**
+     * Animation states.
+     * @enum {string}
+     */
+    Trex.status = {
+        CRASHED: 'CRASHED',
