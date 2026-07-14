@@ -1564,3 +1564,90 @@
      */
     Trex.status = {
         CRASHED: 'CRASHED',
+        DUCKING: 'DUCKING',
+        JUMPING: 'JUMPING',
+        RUNNING: 'RUNNING',
+        WAITING: 'WAITING'
+    };
+
+    /**
+     * Blinking coefficient.
+     * @const
+     */
+    Trex.BLINK_TIMING = 7000;
+
+
+    /**
+     * Animation config for different states.
+     * @enum {Object}
+     */
+    Trex.animFrames = {
+        WAITING: {
+            frames: [44, 0],
+            msPerFrame: 1000 / 3
+        },
+        RUNNING: {
+            frames: [88, 132],
+            msPerFrame: 1000 / 12
+        },
+        CRASHED: {
+            frames: [220],
+            msPerFrame: 1000 / 60
+        },
+        JUMPING: {
+            frames: [0],
+            msPerFrame: 1000 / 60
+        },
+        DUCKING: {
+            frames: [264, 323],
+            msPerFrame: 1000 / 8
+        }
+    };
+
+
+    Trex.prototype = {
+        /**
+         * T-rex player initaliser.
+         * Sets the t-rex to blink at random intervals.
+         */
+        init: function () {
+            this.groundYPos = Runner.defaultDimensions.HEIGHT - this.config.HEIGHT -
+                Runner.config.BOTTOM_PAD;
+            this.yPos = this.groundYPos;
+            this.minJumpHeight = this.groundYPos - this.config.MIN_JUMP_HEIGHT;
+
+            this.draw(0, 0);
+            this.update(0, Trex.status.WAITING);
+        },
+
+        /**
+         * Setter for the jump velocity.
+         * The approriate drop velocity is also set.
+         */
+        setJumpVelocity: function (setting) {
+            this.config.INIITAL_JUMP_VELOCITY = -setting;
+            this.config.DROP_VELOCITY = -setting / 2;
+        },
+
+        /**
+         * Set the animation status.
+         * @param {!number} deltaTime
+         * @param {Trex.status} status Optional status to switch to.
+         */
+        update: function (deltaTime, opt_status) {
+            this.timer += deltaTime;
+
+            // Update the status.
+            if (opt_status) {
+                this.status = opt_status;
+                this.currentFrame = 0;
+                this.msPerFrame = Trex.animFrames[opt_status].msPerFrame;
+                this.currentAnimFrames = Trex.animFrames[opt_status].frames;
+
+                if (opt_status == Trex.status.WAITING) {
+                    this.animStartTime = getTimeStamp();
+                    this.setBlinkDelay();
+                }
+            }
+
+            // Game intro animation, T-rex moves in from the left.
