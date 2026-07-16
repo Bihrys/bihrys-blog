@@ -1738,3 +1738,90 @@
                 if (this.currentFrame == 1) {
                     // Set new random delay to blink.
                     this.setBlinkDelay();
+                    this.animStartTime = time;
+                    this.blinkCount++;
+                }
+            }
+        },
+
+        /**
+         * Initialise a jump.
+         * @param {number} speed
+         */
+        startJump: function (speed) {
+            if (!this.jumping) {
+                this.update(0, Trex.status.JUMPING);
+                // Tweak the jump velocity based on the speed.
+                this.jumpVelocity = this.config.INIITAL_JUMP_VELOCITY - (speed / 10);
+                this.jumping = true;
+                this.reachedMinHeight = false;
+                this.speedDrop = false;
+            }
+        },
+
+        /**
+         * Jump is complete, falling down.
+         */
+        endJump: function () {
+            if (this.reachedMinHeight &&
+                this.jumpVelocity < this.config.DROP_VELOCITY) {
+                this.jumpVelocity = this.config.DROP_VELOCITY;
+            }
+        },
+
+        /**
+         * Update frame for a jump.
+         * @param {number} deltaTime
+         * @param {number} speed
+         */
+        updateJump: function (deltaTime, speed) {
+            var msPerFrame = Trex.animFrames[this.status].msPerFrame;
+            var framesElapsed = deltaTime / msPerFrame;
+
+            // Speed drop makes Trex fall faster.
+            if (this.speedDrop) {
+                this.yPos += Math.round(this.jumpVelocity *
+                    this.config.SPEED_DROP_COEFFICIENT * framesElapsed);
+            } else {
+                this.yPos += Math.round(this.jumpVelocity * framesElapsed);
+            }
+
+            this.jumpVelocity += this.config.GRAVITY * framesElapsed;
+
+            // Minimum height has been reached.
+            if (this.yPos < this.minJumpHeight || this.speedDrop) {
+                this.reachedMinHeight = true;
+            }
+
+            // Reached max height
+            if (this.yPos < this.config.MAX_JUMP_HEIGHT || this.speedDrop) {
+                this.endJump();
+            }
+
+            // Back down at ground level. Jump completed.
+            if (this.yPos > this.groundYPos) {
+                this.reset();
+                this.jumpCount++;
+            }
+
+            this.update(deltaTime);
+        },
+
+        /**
+         * Set the speed drop. Immediately cancels the current jump.
+         */
+        setSpeedDrop: function () {
+            this.speedDrop = true;
+            this.jumpVelocity = 1;
+        },
+
+        /**
+         * @param {boolean} isDucking.
+         */
+        setDuck: function (isDucking) {
+            if (isDucking && this.status != Trex.status.DUCKING) {
+                this.update(0, Trex.status.DUCKING);
+                this.ducking = true;
+            } else if (this.status == Trex.status.DUCKING) {
+                this.update(0, Trex.status.RUNNING);
+                this.ducking = false;
