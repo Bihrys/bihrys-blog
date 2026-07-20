@@ -1912,3 +1912,90 @@
         COEFFICIENT: 0.025,
 
         // Flash duration in milliseconds.
+        FLASH_DURATION: 1000 / 4,
+
+        // Flash iterations for achievement animation.
+        FLASH_ITERATIONS: 3
+    };
+
+
+    DistanceMeter.prototype = {
+        /**
+         * Initialise the distance meter to '00000'.
+         * @param {number} width Canvas width in px.
+         */
+        init: function (width) {
+            var maxDistanceStr = '';
+
+            this.calcXPos(width);
+            this.maxScore = this.maxScoreUnits;
+            for (var i = 0; i < this.maxScoreUnits; i++) {
+                this.draw(i, 0);
+                this.defaultString += '0';
+                maxDistanceStr += '9';
+            }
+
+            this.maxScore = parseInt(maxDistanceStr);
+        },
+
+        /**
+         * Calculate the xPos in the canvas.
+         * @param {number} canvasWidth
+         */
+        calcXPos: function (canvasWidth) {
+            this.x = canvasWidth - (DistanceMeter.dimensions.DEST_WIDTH *
+                (this.maxScoreUnits + 1));
+        },
+
+        /**
+         * Draw a digit to canvas.
+         * @param {number} digitPos Position of the digit.
+         * @param {number} value Digit value 0-9.
+         * @param {boolean} opt_highScore Whether drawing the high score.
+         */
+        draw: function (digitPos, value, opt_highScore) {
+            var sourceWidth = DistanceMeter.dimensions.WIDTH;
+            var sourceHeight = DistanceMeter.dimensions.HEIGHT;
+            var sourceX = DistanceMeter.dimensions.WIDTH * value;
+            var sourceY = 0;
+
+            var targetX = digitPos * DistanceMeter.dimensions.DEST_WIDTH;
+            var targetY = this.y;
+            var targetWidth = DistanceMeter.dimensions.WIDTH;
+            var targetHeight = DistanceMeter.dimensions.HEIGHT;
+
+            // For high DPI we 2x source values.
+            if (IS_HIDPI) {
+                sourceWidth *= 2;
+                sourceHeight *= 2;
+                sourceX *= 2;
+            }
+
+            sourceX += this.spritePos.x;
+            sourceY += this.spritePos.y;
+
+            this.canvasCtx.save();
+
+            if (opt_highScore) {
+                // Left of the current score.
+                var highScoreX = this.x - (this.maxScoreUnits * 2) *
+                    DistanceMeter.dimensions.WIDTH;
+                this.canvasCtx.translate(highScoreX, this.y);
+            } else {
+                this.canvasCtx.translate(this.x, this.y);
+            }
+
+            this.canvasCtx.drawImage(this.image, sourceX, sourceY,
+                sourceWidth, sourceHeight,
+                targetX, targetY,
+                targetWidth, targetHeight
+            );
+
+            this.canvasCtx.restore();
+        },
+
+        /**
+         * Covert pixel distance to a 'real' distance.
+         * @param {number} distance Pixel distance ran.
+         * @return {number} The 'real' distance ran.
+         */
