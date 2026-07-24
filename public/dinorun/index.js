@@ -2434,3 +2434,90 @@
                 this.xPos[0], this.yPos,
                 this.dimensions.WIDTH, this.dimensions.HEIGHT);
 
+            this.canvasCtx.drawImage(Runner.imageSprite, this.sourceXPos[1],
+                this.spritePos.y,
+                this.sourceDimensions.WIDTH, this.sourceDimensions.HEIGHT,
+                this.xPos[1], this.yPos,
+                this.dimensions.WIDTH, this.dimensions.HEIGHT);
+        },
+
+        /**
+         * Update the x position of an indivdual piece of the line.
+         * @param {number} pos Line position.
+         * @param {number} increment
+         */
+        updateXPos: function (pos, increment) {
+            var line1 = pos;
+            var line2 = pos == 0 ? 1 : 0;
+
+            this.xPos[line1] -= increment;
+            this.xPos[line2] = this.xPos[line1] + this.dimensions.WIDTH;
+
+            if (this.xPos[line1] <= -this.dimensions.WIDTH) {
+                this.xPos[line1] += this.dimensions.WIDTH * 2;
+                this.xPos[line2] = this.xPos[line1] - this.dimensions.WIDTH;
+                this.sourceXPos[line1] = this.getRandomType() + this.spritePos.x;
+            }
+        },
+
+        /**
+         * Update the horizon line.
+         * @param {number} deltaTime
+         * @param {number} speed
+         */
+        update: function (deltaTime, speed) {
+            var increment = Math.floor(speed * (FPS / 1000) * deltaTime);
+
+            if (this.xPos[0] <= 0) {
+                this.updateXPos(0, increment);
+            } else {
+                this.updateXPos(1, increment);
+            }
+            this.draw();
+        },
+
+        /**
+         * Reset horizon to the starting position.
+         */
+        reset: function () {
+            this.xPos[0] = 0;
+            this.xPos[1] = HorizonLine.dimensions.WIDTH;
+        }
+    };
+
+
+    //******************************************************************************
+
+    /**
+     * Horizon background class.
+     * @param {HTMLCanvasElement} canvas
+     * @param {Object} spritePos Sprite positioning.
+     * @param {Object} dimensions Canvas dimensions.
+     * @param {number} gapCoefficient
+     * @constructor
+     */
+    function Horizon(canvas, spritePos, dimensions, gapCoefficient) {
+        this.canvas = canvas;
+        this.canvasCtx = this.canvas.getContext('2d');
+        this.config = Horizon.config;
+        this.dimensions = dimensions;
+        this.gapCoefficient = gapCoefficient;
+        this.obstacles = [];
+        this.obstacleHistory = [];
+        this.horizonOffsets = [0, 0];
+        this.cloudFrequency = this.config.CLOUD_FREQUENCY;
+        this.spritePos = spritePos;
+        this.nightMode = null;
+
+        // Cloud
+        this.clouds = [];
+        this.cloudSpeed = this.config.BG_CLOUD_SPEED;
+
+        // Horizon
+        this.horizonLine = null;
+        this.init();
+    };
+
+
+    /**
+     * Horizon config.
