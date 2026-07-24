@@ -2695,3 +2695,21 @@
         resize: function (width, height) {
             this.canvas.width = width;
             this.canvas.height = height;
+        },
+
+        /**
+         * Add a new cloud to the horizon.
+         */
+        addCloud: function () {
+            this.clouds.push(new Cloud(this.canvas, this.spritePos.CLOUD,
+                this.dimensions.WIDTH));
+        }
+    };
+})();
+
+
+function onDocumentLoad() {
+    new Runner('.interstitial-wrapper');
+}
+
+document.addEventListener('DOMContentLoaded', onDocumentLoad);
