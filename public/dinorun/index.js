@@ -2608,3 +2608,90 @@
                 obstacle.update(deltaTime, currentSpeed);
 
                 // Clean up existing obstacles.
+                if (obstacle.remove) {
+                    updatedObstacles.shift();
+                }
+            }
+            this.obstacles = updatedObstacles;
+
+            if (this.obstacles.length > 0) {
+                var lastObstacle = this.obstacles[this.obstacles.length - 1];
+
+                if (lastObstacle && !lastObstacle.followingObstacleCreated &&
+                    lastObstacle.isVisible() &&
+                    (lastObstacle.xPos + lastObstacle.width + lastObstacle.gap) <
+                    this.dimensions.WIDTH) {
+                    this.addNewObstacle(currentSpeed);
+                    lastObstacle.followingObstacleCreated = true;
+                }
+            } else {
+                // Create new obstacles.
+                this.addNewObstacle(currentSpeed);
+            }
+        },
+
+        removeFirstObstacle: function () {
+            this.obstacles.shift();
+        },
+
+        /**
+         * Add a new obstacle.
+         * @param {number} currentSpeed
+         */
+        addNewObstacle: function (currentSpeed) {
+            var obstacleTypeIndex = getRandomNum(0, Obstacle.types.length - 1);
+            var obstacleType = Obstacle.types[obstacleTypeIndex];
+
+            // Check for multiples of the same type of obstacle.
+            // Also check obstacle is available at current speed.
+            if (this.duplicateObstacleCheck(obstacleType.type) ||
+                currentSpeed < obstacleType.minSpeed) {
+                this.addNewObstacle(currentSpeed);
+            } else {
+                var obstacleSpritePos = this.spritePos[obstacleType.type];
+
+                this.obstacles.push(new Obstacle(this.canvasCtx, obstacleType,
+                    obstacleSpritePos, this.dimensions,
+                    this.gapCoefficient, currentSpeed, obstacleType.width));
+
+                this.obstacleHistory.unshift(obstacleType.type);
+
+                if (this.obstacleHistory.length > 1) {
+                    this.obstacleHistory.splice(Runner.config.MAX_OBSTACLE_DUPLICATION);
+                }
+            }
+        },
+
+        /**
+         * Returns whether the previous two obstacles are the same as the next one.
+         * Maximum duplication is set in config value MAX_OBSTACLE_DUPLICATION.
+         * @return {boolean}
+         */
+        duplicateObstacleCheck: function (nextObstacleType) {
+            var duplicateCount = 0;
+
+            for (var i = 0; i < this.obstacleHistory.length; i++) {
+                duplicateCount = this.obstacleHistory[i] == nextObstacleType ?
+                    duplicateCount + 1 : 0;
+            }
+            return duplicateCount >= Runner.config.MAX_OBSTACLE_DUPLICATION;
+        },
+
+        /**
+         * Reset the horizon layer.
+         * Remove existing obstacles and reposition the horizon line.
+         */
+        reset: function () {
+            this.obstacles = [];
+            this.horizonLine.reset();
+            this.nightMode.reset();
+        },
+
+        /**
+         * Update the canvas width and scaling.
+         * @param {number} width Canvas width.
+         * @param {number} height Canvas height.
+         */
+        resize: function (width, height) {
+            this.canvas.width = width;
+            this.canvas.height = height;
