@@ -1,0 +1,21 @@
+<svg width="179" height="179" viewBox="0 0 179 179" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 独立正视终端：圆角窗口结合右下切角，脱离原等距立方体构图 -->
+  <path d="M25 6H154C164.493 6 173 14.5066 173 25V132L132 173H25C14.5066 173 6 164.493 6 154V25C6 14.5066 14.5066 6 25 6Z" fill="#111827"/>
+
+  <!-- 内嵌显示区域 -->
+  <path d="M25 19H154C157.314 19 160 21.6863 160 25V126L126 160H25C21.6863 160 19 157.314 19 154V25C19 21.6863 21.6863 19 25 19Z" fill="#374151"/>
+
+  <!-- 顶部标题栏 -->
+  <path d="M25 19H154C157.314 19 160 21.6863 160 25V50H19V25C19 21.6863 21.6863 19 25 19Z" fill="#4B5563"/>
+  <rect x="19" y="49" width="141" height="2" fill="#6B7280"/>
+
+  <!-- 红黄绿控制点 -->
+  <circle cx="35" cy="35" r="5" fill="#EF4444"/>
+  <circle cx="52" cy="35" r="5" fill="#F59E0B"/>
+  <circle cx="69" cy="35" r="5" fill="#10B981"/>
+
+  <!-- 终端中的 -_- 小表情 -->
+  <rect x="39" y="92" width="25" height="7" rx="3.5" fill="#E5E7EB" fill-opacity="0.95"/>
+  <rect x="77" y="111" width="25" height="7" rx="3.5" fill="#E5E7EB" fill-opacity="0.95"/>
+  <rect x="115" y="92" width="25" height="7" rx="3.5" fill="#E5E7EB" fill-opacity="0.95"/>
+</svg>
