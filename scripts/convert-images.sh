@@ -85,3 +85,8 @@ done < <(find "$TARGET_PATH" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -in
 
 echo ""
 echo -e "\033[36mConversion Complete!\033[0m"
+echo "Converted $count files."
+if [ "$count" -gt 0 ]; then
+    saved_mb=$(echo "scale=2; $total_saved / 1048576" | bc)
+    echo "Total space saved: ${saved_mb} MB"
+fi
