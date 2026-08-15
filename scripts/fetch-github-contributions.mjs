@@ -172,3 +172,61 @@ function writeResult(result) {
 	return data;
 }
 
+async function main() {
+	const token = process.env.GITHUB_TOKEN;
+	let result = null;
+	let source = null;
+
+	if (token) {
+		try {
+			console.log("尝试数据源 A：GitHub GraphQL API ...");
+			const r = await fetchFromGraphQL(token);
+			if (isValid(r)) {
+				result = r;
+				source = "GraphQL";
+			} else {
+				console.warn("⚠️ GraphQL 返回数据未通过合理性校验，回退到 jogruber");
+			}
+		} catch (err) {
+			console.warn(`⚠️ GraphQL 数据源失败: ${err.message}`);
+		}
+	} else {
+		console.log("未检测到 GITHUB_TOKEN，跳过 GraphQL，直接使用 jogruber");
+	}
+
+	if (!result) {
+		try {
+			console.log("尝试数据源 B：jogruber ...");
+			const r = await fetchFromJogruber();
+			if (isValid(r)) {
+				result = r;
+				source = "jogruber";
+			} else {
+				console.warn("⚠️ jogruber 返回数据未通过合理性校验");
+			}
+		} catch (err) {
+			console.warn(`⚠️ jogruber 数据源失败: ${err.message}`);
+		}
+	}
+
+	if (!result) {
+		const existing = loadExisting();
+		if (existing) {
+			console.warn("⚠️ 两个数据源均失败，保留旧数据文件，本次不更新");
+			process.exit(0);
+		}
+		console.error("❌ 两个数据源均失败，且不存在旧数据文件");
+		process.exit(1);
+	}
+
+	const data = writeResult(result);
+	console.log(`✅ 数据源: ${source}`);
+	console.log(`   total: ${data.total}`);
+	console.log(`   days: ${data.days.length}`);
+	console.log(`   写入路径: ${OUTPUT_PATH}`);
+}
+
+main().catch((err) => {
+	console.error("❌ 脚本执行出现未捕获异常:", err);
+	process.exit(1);
+});
