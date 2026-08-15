@@ -85,3 +85,90 @@ async function fetchFromGraphQL(token) {
 	const user = json.data?.user;
 	const calendar = user?.contributionsCollection?.contributionCalendar;
 	if (!calendar) {
+		throw new Error("GraphQL 响应缺少 contributionCalendar 字段");
+	}
+
+	const days = calendar.weeks.flatMap((week) =>
+		week.contributionDays.map((day) => ({
+			date: day.date,
+			count: day.contributionCount,
+			level: GRAPHQL_LEVEL_MAP[day.contributionLevel] ?? 0,
+		})),
+	);
+
+	return {
+		name: user.name || null,
+		avatarUrl: user.avatarUrl || `https://github.com/${USERNAME}.png`,
+		total: calendar.totalContributions,
+		days,
+	};
+}
+
+/**
+ * 数据源 B：jogruber 第三方接口（无需 token）
+ */
+async function fetchFromJogruber() {
+	const res = await fetch(
+		`https://github-contributions-api.jogruber.de/v4/${USERNAME}?y=last`,
+		{ signal: AbortSignal.timeout(TIMEOUT_MS) },
+	);
+
+	if (!res.ok) {
+		throw new Error(`jogruber HTTP ${res.status} ${res.statusText}`);
+	}
+
+	const json = await res.json();
+	const days = (json.contributions || []).map((day) => ({
+		date: day.date,
+		count: day.count,
+		level: day.level,
+	}));
+
+	// jogruber 接口不返回展示名和头像，展示名留空由前端回退为用户名，
+	// 头像直接用 GitHub 的免鉴权头像地址（稳定、无需 token）。
+	return {
+		name: null,
+		avatarUrl: `https://github.com/${USERNAME}.png`,
+		total: json.total?.lastYear ?? 0,
+		days,
+	};
+}
+
+/**
+ * 基本合理性校验：避免把畸形数据当作有效结果写入文件
+ */
+function isValid(result) {
+	if (!result || !Array.isArray(result.days)) return false;
+	if (result.days.length < 300 || result.days.length > 400) return false;
+	if (typeof result.avatarUrl !== "string" || !result.avatarUrl) return false;
+	return result.days.every(
+		(d) =>
+			typeof d.date === "string" &&
+			typeof d.count === "number" &&
+			typeof d.level === "number",
+	);
+}
+
+function loadExisting() {
+	if (!existsSync(OUTPUT_PATH)) return null;
+	try {
+		return JSON.parse(readFileSync(OUTPUT_PATH, "utf-8"));
+	} catch {
+		return null;
+	}
+}
+
+function writeResult(result) {
+	mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
+	const data = {
+		username: USERNAME,
+		name: result.name,
+		avatarUrl: result.avatarUrl,
+		total: result.total,
+		updatedAt: new Date().toISOString(),
+		days: result.days,
+	};
+	writeFileSync(OUTPUT_PATH, `${JSON.stringify(data, null, 2)}\n`, "utf-8");
+	return data;
+}
+
