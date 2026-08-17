@@ -85,3 +85,90 @@ function yamlEscape(str) {
 
 function writeMarkdown(outBase, fileSlug, frontmatter, body) {
   const dir = path.join(outBase, fileSlug);
+  const file = path.join(outBase, `${fileSlug}.md`);
+  // if user wants nested directories by date/slug, adjust here
+  const fm = [];
+  fm.push('---');
+  fm.push(`title: ${yamlEscape(frontmatter.title || 'Untitled')}`);
+  fm.push(`published: ${frontmatter.published || new Date().toISOString()}`);
+  if (frontmatter.updated) fm.push(`updated: ${frontmatter.updated}`);
+  fm.push(`description: ${yamlEscape(frontmatter.description || '')}`);
+  if (frontmatter.image) fm.push(`image: ${yamlEscape(frontmatter.image)}`);
+  fm.push(`tags: ${JSON.stringify(frontmatter.tags || [])}`);
+  if (frontmatter.draft) fm.push(`draft: true`);
+  fm.push(`lang: ${yamlEscape(frontmatter.lang || '')}`);
+  fm.push('---');
+  fm.push('');
+  fm.push(body || '');
+  const fmLines = fm.join('\n');
+
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, fmLines, 'utf8');
+  return file;
+}
+
+async function main() {
+  const SQL = await initSqlJs({ locateFile: (f) => `node_modules/sql.js/dist/${f}` });
+  const u8 = new Uint8Array(fs.readFileSync(dbPath));
+  const db = new SQL.Database(u8);
+
+  // 1) Introspect tables
+  const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;");
+  const tableNames = tables[0]?.values?.map((row) => row[0]) || [];
+  console.log('Tables:', tableNames);
+
+  // Optional: inspect resources table if present (for images mapping)
+  if (tableNames.includes('resources')) {
+    try {
+      const rCols = db.exec('PRAGMA table_info(resources);')[0]?.values?.map((r) => ({ cid: r[0], name: r[1], type: r[2] })) || [];
+      console.log('resources Columns:', rCols);
+      const rSample = db.exec('SELECT * FROM resources LIMIT 3;');
+      if (rSample.length) {
+        const cols = rSample[0].columns;
+        const vals = rSample[0].values.map((row) => Object.fromEntries(row.map((v, i) => [cols[i], v])));
+        console.log('resources Preview (first 3):', vals);
+      }
+    } catch (e) {
+      console.log('resources inspect error:', e?.message || e);
+    }
+  }
+
+  // Heuristics: find likely posts table and columns
+  const candidateTables = tableNames.filter((t) => /post|article|blog|entry|project|note/i.test(t));
+  let postsTable = candidateTables[0] || tableNames[0];
+  if (!postsTable) {
+    console.error('No tables found in DB.');
+    process.exit(1);
+  }
+
+  const pragma = db.exec(`PRAGMA table_info(${postsTable});`);
+  const columns = pragma[0]?.values?.map((r) => ({ cid: r[0], name: r[1], type: r[2] })) || [];
+  console.log(`Using posts table: ${postsTable}`);
+  console.log('Columns:', columns);
+
+  // 2) Pull rows
+  const rowsRes = db.exec(`SELECT * FROM ${postsTable} ORDER BY rowid ASC;`);
+  if (!rowsRes.length) {
+    console.warn('No rows found in table', postsTable);
+    return;
+  }
+  const res = rowsRes[0];
+  const colNames = res.columns;
+  const rows = res.values.map((r) => Object.fromEntries(r.map((v, i) => [colNames[i], v])));
+
+  // 3) Basic mapping guesses
+  const mapGuess = {
+    title: colNames.find((c) => /title|name|subject/i.test(c)),
+    content: colNames.find((c) => /content|body|markdown|md|text/i.test(c)),
+    published: colNames.find((c) => /published|created_at|create|date|time|pub/i.test(c)),
+    updated: colNames.find((c) => /updated|update|modified|modify/i.test(c)),
+    tags: colNames.find((c) => /tags|label|keywords/i.test(c)),
+    image: colNames.find((c) => /image|cover|banner|thumb/i.test(c)),
+    slug: colNames.find((c) => /slug|path|url|link/i.test(c)),
+    draft: colNames.find((c) => /draft|hidden|private/i.test(c)),
+    lang: colNames.find((c) => /lang|language/i.test(c)),
+    description: colNames.find((c) => /description|desc|summary|abstract|excerpt/i.test(c)),
+  };
+
+  console.log('Mapping guess:', mapGuess);
+
