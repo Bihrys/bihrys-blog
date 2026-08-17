@@ -172,3 +172,78 @@ async function main() {
 
   console.log('Mapping guess:', mapGuess);
 
+  // 4) Preview first 3 rows
+  const preview = rows.slice(0, 3).map((row) => ({
+    title: row[mapGuess.title],
+    published: row[mapGuess.published],
+    updated: row[mapGuess.updated],
+    slug: row[mapGuess.slug],
+  tags: row[mapGuess.tags] || (row.category ? [row.category] : undefined),
+  }));
+  console.log('Preview (first 3):', preview);
+
+  if (dryRun) {
+    console.log('\nDry-run only. No files written. Re-run without --dry-run to export.');
+    return;
+  }
+
+  // 5) Export posts
+  let count = 0;
+  const used = new Set();
+  for (const row of rows) {
+    const title = row[mapGuess.title] || 'Untitled';
+    const body = String(row[mapGuess.content] || '');
+    const published = toISODateTime(row[mapGuess.published]);
+    const updated = row[mapGuess.updated] ? toISODateTime(row[mapGuess.updated]) : '';
+    const image = row[mapGuess.image] || '';
+    const draft = !!row[mapGuess.draft] && String(row[mapGuess.draft]).toLowerCase() !== 'false' && row[mapGuess.draft] !== 0;
+    const lang = row[mapGuess.lang] || '';
+    const description = row[mapGuess.description] || '';
+    let tags = row[mapGuess.tags];
+    if (typeof tags === 'string') {
+      try {
+        // try parse JSON array or comma separated
+        const parsed = JSON.parse(tags);
+        if (Array.isArray(parsed)) tags = parsed.map(String);
+        else tags = String(tags).split(/[ ,;]+/).filter(Boolean);
+      } catch {
+        tags = String(tags).split(/[ ,;]+/).filter(Boolean);
+      }
+    } else if (!Array.isArray(tags)) {
+      tags = [];
+    }
+
+    // file slug prefer: explicit slug -> sanitized title
+    let fileSlug = sanitizeSlug(row[mapGuess.slug] || title);
+    let base = fileSlug;
+    let idx = 1;
+    while (used.has(fileSlug)) {
+      fileSlug = `${base}-${idx++}`;
+    }
+    used.add(fileSlug);
+
+    const frontmatter = {
+      title,
+      published,
+      updated,
+      description,
+      image,
+      tags,
+      draft,
+      lang,
+    };
+
+    const filePath = writeMarkdown(outDir, fileSlug, frontmatter, body);
+    count++;
+    if (count <= 5) {
+      console.log(`✓ Wrote ${filePath}`);
+    }
+  }
+
+  console.log(`Done. Exported ${count} posts to ${outDir}`);
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
