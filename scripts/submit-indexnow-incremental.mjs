@@ -172,3 +172,90 @@ async function forceSubmitAll() {
 
     // 读取构建后的 sitemap
     const sitemapPath = join(process.cwd(), 'dist', 'sitemap-0.xml');
+    const sitemapContent = readFileSync(sitemapPath, 'utf-8');
+
+    // 从 sitemap 中提取 URL
+    const urlMatches = sitemapContent.match(/<loc>(.*?)<\/loc>/g);
+    const urls = urlMatches ? urlMatches.map(match => match.replace(/<\/?loc>/g, '')) : [];
+
+    console.log(`📋 准备提交所有 ${urls.length} 个 URL`);
+
+    // IndexNow 官方配置（通过环境变量提供）
+    const { key, host, keyLocation } = getIndexNowConfig();
+
+    const payload = {
+      host,
+      key,
+      keyLocation,
+      urlList: urls
+    };
+
+    const response = await fetch('https://api.indexnow.org/IndexNow', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'User-Agent': 'Micostar-Blog-IndexNow/1.0'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const isSuccess = response.status === 200 || response.status === 202;
+
+    if (isSuccess) {
+      console.log(`✅ 强制提交成功! (HTTP ${response.status})`);
+
+      // 重置记录
+      const submittedData = {
+        urls: urls,
+        lastSubmitted: new Date().toISOString(),
+        totalSubmissions: 1,
+        lastSubmissionDetails: {
+          newUrlsCount: urls.length,
+          totalUrlsCount: urls.length,
+          timestamp: new Date().toISOString(),
+          status: response.status,
+          forcedSubmission: true
+        }
+      };
+
+      saveSubmittedUrls(submittedData);
+
+    } else {
+      console.error(`❌ 强制提交失败: HTTP ${response.status}`);
+      process.exit(1);
+    }
+
+  } catch (error) {
+    console.error('❌ 强制提交失败:', error.message);
+    process.exit(1);
+  }
+}
+
+// 查看提交状态
+function showStatus() {
+  const submittedData = getSubmittedUrls();
+
+  console.log('📊 IndexNow 提交状态:');
+  console.log(`   - 已提交URL数量: ${submittedData.urls?.length || 0}`);
+  console.log(`   - 上次提交时间: ${submittedData.lastSubmitted || '从未提交'}`);
+  console.log(`   - 总提交次数: ${submittedData.totalSubmissions || 0}`);
+
+  if (submittedData.lastSubmissionDetails) {
+    const details = submittedData.lastSubmissionDetails;
+    console.log(`   - 上次提交详情:`);
+    console.log(`     • 新增URL数: ${details.newUrlsCount}`);
+    console.log(`     • 总URL数: ${details.totalUrlsCount}`);
+    console.log(`     • 响应状态: ${details.status}`);
+    console.log(`     • 是否强制提交: ${details.forcedSubmission ? '是' : '否'}`);
+  }
+}
+
+// 清除提交记录
+function clearStatus() {
+  if (existsSync(SUBMITTED_URLS_FILE)) {
+    writeFileSync(SUBMITTED_URLS_FILE, JSON.stringify({
+      urls: [],
+      lastSubmitted: null,
+      totalSubmissions: 0
+    }, null, 2));
+    console.log('✅ 已清除IndexNow提交记录');
