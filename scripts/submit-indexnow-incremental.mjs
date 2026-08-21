@@ -85,3 +85,90 @@ async function submitIncrementalIndexNow() {
       console.log(`   - 总页面数: ${currentUrls.length}`);
       console.log(`   - 已提交数: ${submittedUrls.size}`);
       console.log(`   - 上次提交: ${submittedData.lastSubmitted || '从未提交'}`);
+      console.log(`   - 提交次数: ${submittedData.totalSubmissions || 0}`);
+      return;
+    }
+
+    console.log(`🚀 发现 ${newUrls.length} 个新增URL需要提交:`);
+    newUrls.forEach((url, index) => {
+      console.log(`   ${index + 1}. ${url}`);
+    });
+
+    // IndexNow 官方配置（通过环境变量提供）
+    const { key, host, keyLocation } = getIndexNowConfig();
+
+    const payload = {
+      host,
+      key,
+      keyLocation,
+      urlList: newUrls
+    };
+
+    // 提交到 IndexNow 官方 API
+    console.log('🔄 正在提交新增URL到 api.indexnow.org...');
+
+    const response = await fetch('https://api.indexnow.org/IndexNow', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'User-Agent': 'Micostar-Blog-IndexNow/1.0'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    // IndexNow API 通常返回空响应体
+    let responseBody = '';
+    try {
+      responseBody = await response.text();
+    } catch (e) {
+      // 正常情况，IndexNow通常返回空响应
+    }
+
+    const isSuccess = response.status === 200 || response.status === 202;
+
+    if (isSuccess) {
+      console.log(`✅ IndexNow 提交成功! (HTTP ${response.status})`);
+
+      // 更新已提交URL记录
+      const updatedSubmittedData = {
+        urls: [...submittedUrls, ...newUrls],
+        lastSubmitted: new Date().toISOString(),
+        totalSubmissions: (submittedData.totalSubmissions || 0) + 1,
+        lastSubmissionDetails: {
+          newUrlsCount: newUrls.length,
+          totalUrlsCount: currentUrls.length,
+          timestamp: new Date().toISOString(),
+          status: response.status,
+          newUrls: newUrls
+        }
+      };
+
+      saveSubmittedUrls(updatedSubmittedData);
+
+      console.log(`📊 提交统计:`);
+      console.log(`   - 本次新增: ${newUrls.length} 个URL`);
+      console.log(`   - 累计提交: ${updatedSubmittedData.urls.length} 个URL`);
+      console.log(`   - 提交次数: ${updatedSubmittedData.totalSubmissions}`);
+      console.log(`   - 节省额度: ${currentUrls.length - newUrls.length} 个URL (${Math.round((1 - newUrls.length / currentUrls.length) * 100)}%)`);
+
+    } else {
+      console.error(`❌ IndexNow 提交失败: HTTP ${response.status} ${response.statusText}`);
+      if (responseBody) {
+        console.error('响应内容:', responseBody);
+      }
+      process.exit(1);
+    }
+
+  } catch (error) {
+    console.error('❌ 提交过程中发生错误:', error.message);
+    process.exit(1);
+  }
+}
+
+// 强制重新提交所有URL的选项
+async function forceSubmitAll() {
+  try {
+    console.log('🔄 强制提交模式：将提交所有URL...');
+
+    // 读取构建后的 sitemap
+    const sitemapPath = join(process.cwd(), 'dist', 'sitemap-0.xml');
