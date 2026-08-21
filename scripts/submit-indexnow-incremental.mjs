@@ -259,3 +259,40 @@ function clearStatus() {
       totalSubmissions: 0
     }, null, 2));
     console.log('✅ 已清除IndexNow提交记录');
+  } else {
+    console.log('ℹ️ 没有找到提交记录文件');
+  }
+}
+
+// 命令行参数处理
+const args = process.argv.slice(2);
+const command = args[0];
+
+switch (command) {
+  case '--force':
+  case '-f':
+    forceSubmitAll();
+    break;
+  case '--status':
+  case '-s':
+    showStatus();
+    break;
+  case '--clear':
+  case '-c':
+    clearStatus();
+    break;
+  case '--help':
+  case '-h':
+    console.log('IndexNow 增量提交工具');
+    console.log('');
+    console.log('用法:');
+    console.log('  pnpm submit-indexnow-incremental          # 增量提交新增URL');
+    console.log('  pnpm submit-indexnow-incremental --force  # 强制提交所有URL');
+    console.log('  pnpm submit-indexnow-incremental --status # 查看提交状态');
+    console.log('  pnpm submit-indexnow-incremental --clear  # 清除提交记录');
+    console.log('  pnpm submit-indexnow-incremental --help   # 显示帮助');
+    break;
+  default:
+    submitIncrementalIndexNow();
+    break;
+}
