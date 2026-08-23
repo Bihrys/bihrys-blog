@@ -85,3 +85,9 @@ async function submitToIndexNow() {
     }
 
   } catch (error) {
+    console.error('❌ 脚本执行失败:', error.message);
+    process.exit(1);
+  }
+}
+
+submitToIndexNow();
