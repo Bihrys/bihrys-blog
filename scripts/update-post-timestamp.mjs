@@ -85,3 +85,33 @@ function getModifiedPosts() {
                 return path.join(ROOT_DIR, filePath);
             });
     } catch (error) {
+        console.error('无法获取 git 状态:', error.message);
+        return [];
+    }
+}
+
+// 主函数
+function main() {
+    const args = process.argv.slice(2);
+    
+    if (args.length > 0) {
+        // 更新指定文件
+        const filePath = path.resolve(args[0]);
+        updatePostTimestamp(filePath);
+    } else {
+        // 检查所有已修改的文章
+        const modifiedPosts = getModifiedPosts();
+        
+        if (modifiedPosts.length === 0) {
+            console.log('没有检测到已修改的文章文件');
+            return;
+        }
+
+        console.log(`检测到 ${modifiedPosts.length} 个已修改的文章文件:\n`);
+        modifiedPosts.forEach(filePath => {
+            updatePostTimestamp(filePath);
+        });
+    }
+}
+
+main();
