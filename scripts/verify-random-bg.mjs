@@ -85,3 +85,55 @@ function printTable(rows) {
     const direction = r.orientation || "-";
     const sample = r.finalUrl ? r.finalUrl.replace(/\?_t=\d+/, "?_t=...") : "-";
     const cors = r.corsOrigin || "-";
+    const result = r.ok && !r.error ? "PASS" : "FAIL";
+    console.log(`| ${r.label} | ${status} | ${direction} | ${sample} | ${cors} | ${result} |`);
+  }
+}
+
+async function main() {
+  const rows = [];
+
+  rows.push(await runProbe("桌面 UA", USER_AGENTS.desktop));
+  rows.push(await runProbe("iPhone UA", USER_AGENTS.iphone));
+  rows.push(await runProbe("iPad UA", USER_AGENTS.ipad));
+  rows.push(await runProbe("桌面 UA + XHR", USER_AGENTS.desktop, { xhr: true }));
+
+  // 同 UA 连续请求 3 次，验证随机性和方向一致性
+  const samples = [];
+  for (let i = 0; i < 3; i++) {
+    samples.push(await runProbe(`桌面 UA 第 ${i + 1} 次`, USER_AGENTS.desktop));
+  }
+
+  const allLandscape = samples.every((s) => s.orientation === "landscape");
+  const allDifferent =
+    new Set(samples.map((s) => s.finalUrl.split("?")[0])).size === 3;
+
+  rows.push({
+    label: "桌面 UA 连续 3 次方向一致",
+    statusCode: allLandscape ? "200/302" : "MIXED",
+    orientation: allLandscape ? "landscape" : "inconsistent",
+    finalUrl: "-",
+    corsOrigin: null,
+    ok: allLandscape,
+  });
+
+  rows.push({
+    label: "桌面 UA 连续 3 次结果不同",
+    statusCode: allDifferent ? "200/302" : "DUPLICATE",
+    orientation: "-",
+    finalUrl: "-",
+    corsOrigin: null,
+    ok: allDifferent,
+  });
+
+  printTable(rows);
+
+  const okCount = rows.filter((r) => r.ok).length;
+  console.log(`\n总计: ${okCount}/${rows.length} 项通过`);
+  process.exit(okCount === rows.length ? 0 : 1);
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
