@@ -1,0 +1,87 @@
+name: Auto Merge Friends PR
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'Besty0728'
+    steps:
+      - name: Checkout Base (safe context)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+
+      - name: Verify Changed Files
+        id: verify
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          STATUS="pass"
+          DETAIL=""
+
+          if [ -z "$CHANGED_FILES" ]; then
+            STATUS="fail"
+            DETAIL="没有检测到文件变更"
+          else
+            for file in $CHANGED_FILES; do
+              if [[ "$file" == "src/content/friends/_order.json" ]]; then
+                STATUS="fail"
+                DETAIL="不允许修改 _order.json"
+                break
+              fi
+              if [[ ! "$file" =~ ^src/content/friends/[a-zA-Z0-9_-]+\.json$ ]]; then
+                STATUS="fail"
+                DETAIL="不允许的文件路径: $file（只能修改 src/content/friends/<name>.json）"
+                break
+              fi
+            done
+          fi
+
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "detail=$DETAIL" >> $GITHUB_OUTPUT
+          if [ "$STATUS" = "pass" ]; then
+            echo "files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout PR Head
+        if: steps.verify.outputs.status == 'pass'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Validate JSON Content
+        id: validate
+        if: steps.verify.outputs.status == 'pass'
+        shell: bash
+        run: |
+          cat > /tmp/validate_friend.py << 'PYEOF'
+          import json, sys, re
+          errors = []
+          try:
+              with open(sys.argv[1]) as f:
+                  data = json.load(f)
+          except json.JSONDecodeError as e:
+              print(f"JSON 解析失败: {e}")
+              sys.exit(1)
+          required = ["name", "url", "avatar", "introduction", "friendsPage"]
+          for field in required:
+              if field not in data or not isinstance(data[field], str) or not data[field].strip():
+                  errors.append(f"缺少或为空的必需字段: {field}")
+          for url_field in ["url", "avatar", "friendsPage"]:
+              if url_field in data and isinstance(data[url_field], str) and not re.match(r"^https?://", data[url_field]):
+                  errors.append(f"{url_field} 必须以 http:// 或 https:// 开头")
+          for key, val in data.items():
+              if not isinstance(val, str):
