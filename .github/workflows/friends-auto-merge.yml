@@ -85,3 +85,90 @@ jobs:
                   errors.append(f"{url_field} 必须以 http:// 或 https:// 开头")
           for key, val in data.items():
               if not isinstance(val, str):
+                  errors.append(f"字段 {key} 必须是字符串")
+              elif re.search(r"<script|javascript:|on\w+=", val, re.IGNORECASE):
+                  errors.append(f"字段 {key} 包含可疑内容")
+          allowed = {"name", "url", "avatar", "introduction", "friendsPage"}
+          extra = set(data.keys()) - allowed
+          if extra:
+              errors.append(f"未知字段: {extra}")
+          if errors:
+              print("; ".join(errors))
+              sys.exit(1)
+          print("OK")
+          PYEOF
+
+          STATUS="pass"
+          DETAIL=""
+          FILES="${{ steps.verify.outputs.files }}"
+          for file in $FILES; do
+            if [ ! -f "$file" ]; then
+              STATUS="fail"
+              DETAIL="${DETAIL}文件 $file 不存在; "
+              continue
+            fi
+            SIZE=$(stat -c%s "$file")
+            if [ "$SIZE" -gt 2048 ]; then
+              STATUS="fail"
+              DETAIL="${DETAIL}$file 超过 2KB 大小限制; "
+              continue
+            fi
+            RESULT=$(python3 /tmp/validate_friend.py "$file" 2>&1) || {
+              STATUS="fail"
+              DETAIL="${DETAIL}${file}: ${RESULT}; "
+            }
+          done
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "detail=$DETAIL" >> $GITHUB_OUTPUT
+
+      - name: Check Backlink
+        id: backlink
+        if: steps.verify.outputs.status == 'pass'
+        shell: bash
+        run: |
+          RESULT=""
+          STATUS="pass"
+          FILES="${{ steps.verify.outputs.files }}"
+          for file in $FILES; do
+            FRIENDS_PAGE=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['friendsPage'])" "$file")
+            NAME=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['name'])" "$file")
+            HTTP_CODE=$(curl -s -o /tmp/page.html -w "%{http_code}" -L --max-time 15 "$FRIENDS_PAGE" 2>/dev/null || echo "000")
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+              if grep -qi 'href="[^"]*www\.micostar\.cc[^"]*"' /tmp/page.html; then
+                RESULT="${RESULT}${NAME}: ✅ 已添加互链\n"
+              else
+                RESULT="${RESULT}${NAME}: ❌ 未检测到 www.micostar.cc 的链接\n"
+                STATUS="fail"
+              fi
+            else
+              RESULT="${RESULT}${NAME}: ⚠️ 无法访问友链页面 (HTTP ${HTTP_CODE})\n"
+              STATUS="fail"
+            fi
+          done
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "result<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$RESULT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          if [ "$STATUS" = "fail" ]; then
+            echo "detail=互链检测未通过" >> $GITHUB_OUTPUT
+          else
+            echo "detail=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Gate Check
+        id: gate
+        run: |
+          VERIFY="${{ steps.verify.outputs.status }}"
+          VALIDATE="${{ steps.validate.outputs.status }}"
+          BACKLINK="${{ steps.backlink.outputs.status }}"
+          if [ "$VERIFY" = "pass" ] && [ "$VALIDATE" = "pass" ] && [ "$BACKLINK" = "pass" ]; then
+            echo "status=pass" >> $GITHUB_OUTPUT
+          else
+            echo "status=fail" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install pnpm
+        if: steps.gate.outputs.status == 'pass'
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
