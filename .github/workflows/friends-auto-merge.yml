@@ -172,3 +172,90 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Set up Node.js
+        if: steps.gate.outputs.status == 'pass'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        if: steps.gate.outputs.status == 'pass'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Check
+        id: build
+        if: steps.gate.outputs.status == 'pass'
+        run: |
+          if pnpm build; then
+            echo "status=pass" >> $GITHUB_OUTPUT
+          else
+            echo "status=fail" >> $GITHUB_OUTPUT
+            echo "detail=构建失败，请检查代码" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto Merge
+        if: steps.gate.outputs.status == 'pass' && steps.build.outputs.status == 'pass'
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} \
+            --squash \
+            --subject "🤝 友链申请：欢迎 ${{ github.event.pull_request.user.login }}" \
+            --body "友链机器人自动验证通过 ✅"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Order
+        if: steps.gate.outputs.status == 'pass' && steps.build.outputs.status == 'pass'
+        shell: bash
+        run: |
+          git checkout main
+          git pull origin main
+
+          cat > /tmp/update_order.py << 'PYEOF'
+          import json, sys
+          order_file = "src/content/friends/_order.json"
+          with open(order_file) as f:
+              order = json.load(f)
+          name = sys.argv[1]
+          if name not in order:
+              order.append(name)
+              with open(order_file, "w") as f:
+                  json.dump(order, f, indent=2, ensure_ascii=False)
+                  f.write("\n")
+              print(f"Added {name} to _order.json")
+          else:
+              print(f"{name} already in _order.json")
+          PYEOF
+
+          FILES="${{ steps.verify.outputs.files }}"
+          for file in $FILES; do
+            ID=$(basename "$file" .json)
+            python3 /tmp/update_order.py "$ID"
+          done
+          if git diff --quiet; then
+            echo "No order changes needed."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add src/content/friends/_order.json
+            git commit -m "chore: update friends order"
+            git push origin main
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on PR
+        if: always()
+        shell: bash
+        run: |
+          V_STATUS="${{ steps.verify.outputs.status }}"
+          V_DETAIL="${{ steps.verify.outputs.detail }}"
+          J_STATUS="${{ steps.validate.outputs.status }}"
+          J_DETAIL="${{ steps.validate.outputs.detail }}"
+          B_STATUS="${{ steps.backlink.outputs.status }}"
+          B_DETAIL="${{ steps.backlink.outputs.result }}"
+          BUILD_STATUS="${{ steps.build.outputs.status }}"
+          BUILD_DETAIL="${{ steps.build.outputs.detail }}"
+
+          icon() { if [ "$1" = "pass" ]; then echo "✅"; elif [ "$1" = "fail" ]; then echo "❌"; else echo "⏭️"; fi; }
+          desc() { if [ -n "$2" ]; then echo "$2"; elif [ "$1" = "pass" ]; then echo "通过"; else echo "未执行"; fi; }
+
