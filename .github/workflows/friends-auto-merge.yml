@@ -259,3 +259,53 @@ jobs:
           icon() { if [ "$1" = "pass" ]; then echo "✅"; elif [ "$1" = "fail" ]; then echo "❌"; else echo "⏭️"; fi; }
           desc() { if [ -n "$2" ]; then echo "$2"; elif [ "$1" = "pass" ]; then echo "通过"; else echo "未执行"; fi; }
 
+          V_ICON=$(icon "$V_STATUS"); J_ICON=$(icon "$J_STATUS")
+          B_ICON=$(icon "$B_STATUS"); BUILD_ICON=$(icon "$BUILD_STATUS")
+          V_DESC=$(desc "$V_STATUS" "$V_DETAIL"); J_DESC=$(desc "$J_STATUS" "$J_DETAIL")
+          BUILD_DESC=$(desc "$BUILD_STATUS" "$BUILD_DETAIL")
+          if [ "$B_STATUS" = "pass" ]; then B_DESC="通过"
+          elif [ -n "$B_DETAIL" ]; then B_DESC=$(echo -e "$B_DETAIL" | tr '\n' ' ')
+          else B_DESC="未执行"; fi
+
+          GATE="${{ steps.gate.outputs.status }}"
+          if [ "$GATE" = "pass" ] && [ "$BUILD_STATUS" = "pass" ]; then
+            TITLE="## ✅ 友链验证通过"
+            LABEL_ADD="✅ 验证通过"
+            LABEL_REMOVE="❌ 验证未通过"
+          else
+            TITLE="## ❌ 友链自动验证未通过"
+            LABEL_ADD="❌ 验证未通过"
+            LABEL_REMOVE="✅ 验证通过"
+          fi
+
+          BODY="${TITLE}
+
+          | 检查项 | 结果 | 说明 |
+          |:---|:---:|:---|
+          | 📁 文件路径 | ${V_ICON} | ${V_DESC} |
+          | 📋 JSON 格式 | ${J_ICON} | ${J_DESC} |
+          | 🔗 互链检测 | ${B_ICON} | ${B_DESC} |
+          | 🏗️ 构建检查 | ${BUILD_ICON} | ${BUILD_DESC} |"
+
+          if [ "$GATE" != "pass" ] || [ "$BUILD_STATUS" != "pass" ]; then
+            BODY="${BODY}
+
+          请根据上述结果修正后更新 PR。
+          详情请查看 [Action 日志](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})。"
+          fi
+
+          gh pr comment ${{ github.event.pull_request.number }} --body "$BODY"
+
+          # Ensure labels exist, then add/remove
+          REPO="${{ github.repository }}"
+          API="https://api.github.com/repos/${REPO}/labels"
+          for L in "✅ 验证通过" "❌ 验证未通过"; do
+            curl -s -X POST "$API" \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -d "{\"name\":\"$L\",\"color\":\"ededed\"}" > /dev/null 2>&1 || true
+          done
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "$LABEL_ADD" 2>/dev/null || true
+          gh pr edit ${{ github.event.pull_request.number }} --remove-label "$LABEL_REMOVE" 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
