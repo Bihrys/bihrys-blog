@@ -85,3 +85,90 @@
 | `pnpm type-check` | TypeScript type check |
 
 ### Creating Content
+Posts are located in `src/content/posts/`.
+**Frontmatter Example:**
+```yaml
+---
+title: "Post Title"           # Required
+published: 2023-01-01         # Required (YYYY-MM-DD)
+updated: 2023-01-02           # Optional
+draft: false                  # Optional
+description: "Summary"        # Optional
+image: "./cover.jpg"          # Optional
+tags: ["Tag1", "Tag2"]        # Optional
+category: "Category"          # Optional
+pinned: false                 # Optional: Pin to top
+prerenderAll: false           # Optional: Pre-render content (for long posts)
+lang: zh_CN                   # Optional
+---
+```
+
+---
+
+## Friend Links Automation
+
+### Data Structure
+Each friend link is a JSON file in `src/content/friends/`:
+```json
+{
+  "name": "Site Name",
+  "url": "https://example.com",
+  "avatar": "https://example.com/avatar.png",
+  "introduction": "Short description",
+  "friendsPage": "https://example.com/friends/"
+}
+```
+
+### Sorting
+- `src/content/friends/_order.json`: Array of friend IDs controlling display order (earliest added first).
+- `src/pages/friends.astro`: Reads `_order.json` for sorting; entries not in the array appear last.
+- The `_` prefix ensures Astro ignores it as a collection entry.
+
+### GitHub Actions Auto-Merge (`friends-auto-merge.yml`)
+| Step | Description |
+| :--- | :--- |
+| **Verify Changed Files** | Whitelist check: only `src/content/friends/<name>.json` allowed; `_order.json` modification blocked. Outputs `status`/`detail` without exiting on failure. |
+| **Validate JSON Content** | Schema validation (required fields, URL format, XSS check, no extra fields, 2KB size limit). Collects all errors before reporting. |
+| **Check Backlink** | Fetches `friendsPage` URL, checks for `href` containing `www.micostar.cc`. Outputs per-entry results. |
+| **Gate Check** | Aggregates results from above 3 steps. Only proceeds to Build/Merge if all pass. |
+| **Build Check** | Runs `pnpm build` (skipped if Gate fails). Captures pass/fail status. |
+| **Auto Merge** | Squash merge with welcome message (skipped if Gate or Build fails) |
+| **Update Order** | Appends new friend ID to `_order.json` and pushes to main |
+| **Comment on PR** | Posts structured table with per-step ✅/❌/⏭️ results and specific error details |
+| **Label** | Adds `✅ 验证通过` or `❌ 验证未通过` label (auto-creates labels if missing) |
+
+- **Feedback Format**: PR comment uses a Markdown table showing each check item's status and reason. Failed checks don't block subsequent checks from running (except Build which requires Gate pass).
+- **Trigger**: `pull_request_target` with `types: [opened, synchronize]`.
+- **Security**: Checkout base first for file verification, then PR head for content validation. `pnpm install --frozen-lockfile` prevents lockfile tampering.
+
+---
+
+## IndexNow Integration
+Fuwari integrates IndexNow to automatically submit URLs to search engines (Bing, Yandex, etc.).
+
+### Commands
+- `pnpm submit-indexnow`: Submit all URLs (no build).
+- `pnpm submit-indexnow-inc`: **Incremental submit** (new URLs only).
+- `pnpm submit-indexnow-force`: Force submit all URLs.
+- `pnpm indexnow-status`: Check submission status.
+
+### Implementation
+- **Scripts**: `scripts/submit-indexnow*.mjs`
+- **API**: `src/pages/api/indexnow.ts`
+- **State**: `.indexnow-submitted.json` (Do not commit)
+
+---
+
+## Integrations & Plugins
+
+### Markdown & Content (Remark/Rehype)
+- **Math**: `remark-math` + `rehype-katex`
+- **Code**: Expressive Code (GitHub Dark theme) with custom plugins:
+    - Collapsible sections
+    - Line numbers
+    - Custom copy button
+- **Content**:
+    - `remark-reading-time` (Reading time)
+    - `rehype-slug` & `rehype-autolink-headings` (Anchors)
+    - Custom components: GitHub Cards, Admonitions
+
