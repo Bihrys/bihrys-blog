@@ -172,3 +172,90 @@ Fuwari integrates IndexNow to automatically submit URLs to search engines (Bing,
     - `rehype-slug` & `rehype-autolink-headings` (Anchors)
     - Custom components: GitHub Cards, Admonitions
 
+### Mermaid Diagrams
+Implemented in `src/pages/posts/[...slug].astro`.
+- **Features**: Async loading, theme synchronization, Swup compatibility, Details tag support.
+
+### Image Handling
+- **Image Fallback**: Custom rehype plugin `rehype-image-fallback`.
+    - Automatically switches to backup CDN if main CDN fails.
+    - Configured in `src/config.ts` (`imageFallbackConfig`).
+- **Anti-Leech**: Configured via `antiLeechConfig`.
+
+---
+
+## Deployment
+- **Output**: `./dist/`
+- **Vercel Config**: `vercel.json` included (Security headers, caching, URL rewrites).
+- **Environment**: Requires Node 18+.
+
+## Development Conventions
+- **Styling**: Use Tailwind CSS utilities. Custom styles in `src/styles/`.
+- **Logic**: Use Svelte for interactivity, Astro for static content.
+- **Path Aliases**:
+    - `@components/*` -> `src/components/*`
+    - `@utils/*` -> `src/utils/*`
+    - `@assets/*` -> `src/assets/*`
+    - `@/*` -> `src/*`
+
+---
+
+## Navigation Architecture
+
+### Navbar Layout
+The navbar displays all links flat on `lg+` screens (no dropdown groups). Title is on the left, links are centered (`flex-grow justify-center`), controls are on the right. On smaller screens, links collapse into a hamburger menu.
+
+| File | Role |
+| :--- | :--- |
+| `src/types/config.ts` | Defines `NavBarLink`, `NavBarGroup`, `NavBarConfig` types |
+| `src/config.ts` | Configures nav links as flat array (Stats, Status, Monitor listed individually) |
+| `src/components/Navbar.astro` | Renders links centered on `lg+`, hamburger menu on `<lg` |
+| `src/components/widget/NavMenuPanel.astro` | Mobile hamburger menu |
+
+- **Desktop (`lg+`)**: Links use `flex-grow justify-center` for centered layout. Hamburger button hidden via `lg:!hidden`.
+- **Mobile (`<lg`)**: Links hidden, hamburger menu shown. Spacer (`flex-grow lg:hidden`) keeps title and controls apart.
+- **Swup**: Mobile toggle JS re-binds on `swup:contentReplaced` event. Uses `data-bound` attribute to prevent duplicate event listener binding.
+
+### Post Sorting & Hot Pages
+Sorting is handled via `FloatingControls.svelte` with three modes: published, updated, views.
+
+| Mode | Label | Behavior |
+| :--- | :--- | :--- |
+| `published` | 文章创作时间 | Default on `/`. If saved mode is `views` (came from `/hot/`), resets to `published`. |
+| `updated` | 文章更新时间 | Client-side DOM sort (current page only) |
+| `views` | 浏览量排序 | Navigates to `/hot/` (build-time sorted by pageviews) |
+
+- **`/hot/` pages** (`src/pages/hot/[...page].astro`): Static pages sorted by Umami pageviews descending (pinned posts first). Uses `getWritingStats().allPostViews` for sort data.
+- **Cross-page toast**: `sessionStorage` stores toast message before navigation; `onMount` reads and displays it on the target page.
+- **Umami data**: `src/utils/writing-stats.ts` fetches per-post pageviews via `/stats?path=` endpoint (not `/metrics` which returns visitors). Exports `allPostViews: { slug, views }[]`.
+- **Auto-redeploy**: GitHub Actions workflow (`.github/workflows/hot-ranking-check.yml`) runs daily at UTC 16:00 (Beijing 0:00). Fetches Umami pageviews for all posts, compares top 5 ranking against `.hot-ranking-cache.txt`. If changed, updates cache and pushes a commit to trigger redeployment.
+
+### Reading Progress
+Shared state in `src/stores/readingProgress.ts` drives multiple display components.
+
+| Component | Location | Visibility |
+| :--- | :--- | :--- |
+| `ReadingProgressCard.svelte` | Right-side TOC panel (above TOC list) in `MainGridLayout.astro` | Desktop (`2xl+`), post pages only |
+| `ReadingProgressMobile.svelte` | `Layout.astro` (fixed top bar) | Mobile & Tablet (`<2xl`), post pages only, appears after sidebar scrolls out |
+
+- **TOC panel layout** (`MainGridLayout.astro`): `toc-inner-wrapper` uses `flex flex-col`; `ReadingProgressCard` sits above `#toc` which has `flex-1 overflow-y-scroll`.
+- **CSS mask** (`src/styles/main.css`): Fade gradient applied to `#toc-inner-wrapper #toc` (not the wrapper itself) to avoid affecting the progress card.
+
+---
+
+## SEO Architecture
+
+### Meta Tags (`src/layouts/Layout.astro`)
+- **Canonical URL**: `<link rel="canonical" href={Astro.url} />` on all pages.
+- **Open Graph**: `og:site_name`, `og:url`, `og:title`, `og:description`, `og:type` (article/website).
+- **og:image / twitter:image**: Only rendered on post pages when the post has a cover image (`banner` prop). The original `banner` value is saved as `ogImage` before being overridden by `siteConfig.banner.src`, then resolved to a full URL via `new URL(banner, Astro.site)`.
+- **Twitter Card**: `summary_large_image` card type with title, description, URL.
+
+### JSON-LD Structured Data (`src/pages/posts/[...slug].astro`)
+- Each post page includes a `BlogPosting` JSON-LD script with: `headline`, `description`, `keywords`, `author`, `datePublished`, `inLanguage`, and `image` (when post has a cover image, resolved via `new URL(entry.data.image, Astro.site)`).
+
+### Heading Hierarchy
+- **rehype-heading-shift** plugin (`src/plugins/rehype-heading-shift.mjs`): Shifts all Markdown headings down one level (h1→h2, h2→h3, etc.) to ensure only one `<h1>` per page (the post title rendered by the template).
+- **Note**: This plugin only processes Markdown-generated headings. Raw HTML `<h1>` tags in Markdown files are NOT shifted — avoid using `<h1>` in post content.
+
+### Image Alt Attributes
