@@ -259,3 +259,90 @@ Front Matter 下方就是详情页正文，写法和博客文章一致，支持�
 ```yaml
 image: "/images/my-project-cover.webp"
 videoPoster: "/images/my-project-cover.webp"
+```
+
+正文图片同样可以使用：
+
+```markdown
+![项目界面](/images/my-project-screen.webp)
+```
+
+### 草稿和排序
+
+- `draft: true`：生产环境不显示。
+- `featured: true`：在作品列表中优先展示。
+- 同为精选或同为普通作品时，按 `published` 时间从新到旧排序。
+
+## 🔄 更新流程
+
+### 1. 写作流程
+```bash
+# 1. 创建新文章
+pnpm run new-post -- "新文章标题"
+
+# 2. 编辑文章
+# 使用你喜欢的编辑器编辑 .md 文件
+
+# 3. 本地预览
+pnpm run dev
+
+# 4. 提交更改
+git add .
+git commit -m "添加新文章: 新文章标题"
+git push origin main
+```
+
+### 2. 自动部署
+- 推送到 GitHub 后，Vercel 会自动构建和部署
+- 部署时间通常 2-5 分钟
+- 可在 Vercel Dashboard 查看部署状态
+
+### 3. 更新现有文章
+1. 直接编辑对应的 `.md` 文件
+2. 修改 `published` 时间（如需要）
+3. 提交并推送更改
+
+## 🎨 写作技巧
+
+### 1. 标题层次
+- 使用清晰的标题层次结构
+- 避免跳级使用标题（如从 h1 直接到 h3）
+
+### 2. 代码高亮
+支持的语言：
+- `javascript`, `python`, `bash`, `css`, `html`
+- `csharp`, `unity`, `json`, `yaml`
+
+### 3. 内容结构
+建议的文章结构：
+```markdown
+# 主标题
+
+## 前言/介绍
+
+## 主要内容
+### 子主题1
+### 子主题2
+
+## 实践示例
+
+## 总结
+
+## 参考链接
+```
+
+## 🎨 实用格式示例
+
+### 1. 图片使用最佳实践
+```markdown
+# 教程中的截图（放在 public/images/ 目录）
+![命令行界面](/images/ML.png)
+![用户管理界面](/images/UserM.png)
+![文件夹结构](/images/Users.png)
+
+# 带描述的图片
+![资源监视器界面 - 用于查看和管理系统进程](/images/ZYGL.png)
+```
+
+### 2. 重要提示和警告
+```markdown
