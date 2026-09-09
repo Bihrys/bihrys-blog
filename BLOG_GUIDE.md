@@ -433,3 +433,33 @@ description: '简洁明了的文章描述，包含关键词，控制在150字符
 
 ## 🐛 常见问题
 
+### Q: 图片不显示怎么办？
+A: 检查图片链接是否正确，或使用备用CDN
+
+### Q: 文章没有出现在网站上？
+A: 检查 `draft: false` 和 `published` 时间
+
+### Q: 代码高亮不生效？
+A: 确保语言标识符正确，检查代码块格式
+
+### Q: 如何删除文章？
+A: 直接删除对应的 `.md` 文件并提交
+
+### Q: 红色加粗文本不显示怎么办？
+A: 使用 `<span style="color: red; font-weight: bold;">文本</span>` 而不是 `<font>` 标签
+
+### Q: 本地图片不显示？
+A: 确保图片放在 `public/images/` 目录下，使用 `/images/filename.png` 路径
+
+### Q: HTML样式不生效？
+A: 确保使用内联样式 `style="..."` 而不是CSS类名
+
+## 🔗 有用的资源
+
+- [Markdown 语法指南](https://markdown.com.cn/)
+- [Astro 文档](https://docs.astro.build/)
+- [Vercel 文档](https://vercel.com/docs)
+
+---
+
+🎉 **恭喜！** 现在您已经掌握了博客的完整使用方法！开始您的写作之旅吧！
