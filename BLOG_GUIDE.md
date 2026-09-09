@@ -346,3 +346,90 @@ git push origin main
 
 ### 2. 重要提示和警告
 ```markdown
+# 红色加粗警告（推荐方式）
+<span style="color: red; font-weight: bold;">需要重启则重启，后续仍选择超级管理员，误进入原来的用户导致错乱后果自负！！！</span>
+
+# 其他提示样式
+<span style="color: orange; font-weight: bold;">注意事项</span>
+<span style="color: blue; font-weight: bold;">提示信息</span>
+```
+
+### 3. 步骤编号格式
+```markdown
+1. 首先你需要...
+   ![相关截图](/images/step1.png)
+
+2. 然后按下Alt+F4...
+
+3. 在任务管理器（Ctrl+Shift+Esc）...
+   ![任务管理器界面](/images/UserM.png)
+```
+
+### 4. 代码和路径高亮
+```markdown
+# 命令代码块
+```bash
+net user administrator /active:yes
+```
+
+# 文件路径
+```plaintext
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\S-1-5-21-xxx
+```
+
+# 重要参数名
+修改<ins>**ProfileImagePath**</ins>
+```
+
+### 5. 键盘快捷键格式
+```markdown
+# 标准快捷键格式
+按下Alt+F4
+使用Ctrl+Shift+Esc
+Win+R组合键
+```
+
+## 🔧 高级功能
+
+### 1. 草稿功能
+```yaml
+draft: true  # 设置为草稿，不会在网站上显示
+```
+
+### 2. 多语言支持
+```yaml
+lang: 'en'  # 设置文章语言
+```
+
+### 3. 自定义样式
+可以在文章中使用 HTML 标签和内联样式：
+```html
+<div class="custom-style">
+  自定义内容
+</div>
+
+<!-- 推荐的文本样式方法 -->
+<span style="color: red; font-weight: bold;">重要提示</span>
+<span style="background-color: yellow;">高亮文本</span>
+<ins>下划线文本</ins>
+```
+
+## 📊 SEO 优化
+
+### 1. 描述优化
+```yaml
+description: '简洁明了的文章描述，包含关键词，控制在150字符内'
+```
+
+### 2. 标签使用
+- 每篇文章 3-5 个标签
+- 使用相关的技术标签
+- 保持标签的一致性
+
+### 3. 图片 Alt 文本
+```markdown
+![具体描述图片内容的Alt文本](image-url.jpg)
+```
+
+## 🐛 常见问题
+
