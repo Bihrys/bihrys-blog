@@ -85,3 +85,90 @@ pnpm dev
 
 ## 📂 项目结构
 
+```
+src/
+├── config.ts          # 🎯 站点配置入口 (必改)
+├── content/posts/     # 📝 博客文章 (Markdown)
+├── components/        # 🧩 UI 组件
+├── layouts/           # 📐 页面布局
+├── pages/             # 🔗 路由页面
+└── plugins/           # 🔌 Rehype/Remark 插件
+scripts/
+├── new-post.js        # ✍️ 创建新文章脚本
+├── migrate-from-sqlite.mjs  # 📥 SQLite 数据迁移
+└── submit-indexnow*.mjs     # 🔍 IndexNow 推送脚本
+```
+
+---
+
+## ⚙️ 常用命令
+
+| 命令 | 说明 |
+| :--- | :--- |
+| `pnpm dev` | 启动开发服务器 |
+| `pnpm build` | 构建生产版本 |
+| `pnpm preview` | 预览生产构建 |
+| `pnpm new-post "标题"` | 创建新文章 |
+| `pnpm build:indexnow` | 构建并推送 IndexNow |
+| `pnpm lint` | 代码检查 |
+| `pnpm format` | 代码格式化 |
+
+---
+
+## 📝 文章 Frontmatter
+
+```yaml
+---
+title: 文章标题
+published: 2025-01-01
+description: 文章摘要
+image: ./cover.jpg
+tags: [技术, 教程]
+category: 开发笔记
+draft: false
+pinned: true          # 置顶文章
+lang: zh_CN           # 指定语言 (可选)
+---
+```
+
+---
+
+## 🔧 配置说明
+
+主要配置位于 `src/config.ts`：
+
+| 配置项 | 说明 |
+| :--- | :--- |
+| `siteConfig` | 站点标题、描述、主题色、背景图等 |
+| `navBarConfig` | 导航栏链接配置 |
+| `profileConfig` | 作者信息与社交链接 |
+| `imageFallbackConfig` | 双CDN图床域名配置 |
+| `antiLeechConfig` | 防盗链域名白名单 |
+| `umamiConfig` | Umami 分析配置 |
+| `googleAnalyticsConfig` | GA 分析配置 |
+
+---
+
+## 🌐 部署
+
+本项目支持以下平台一键部署：
+- [EdegOne](https://edgeone.ai)(推荐)
+- [Vercel](https://vercel.com)
+- [Netlify](https://netlify.com)
+- [Cloudflare Pages](https://pages.cloudflare.com)
+
+部署前请确保已配置 `astro.config.mjs` 中的 `site` 字段。
+
+---
+
+## 📄 许可证
+
+本项目基于 [MIT License](./LICENSE) 开源。
+
+内容遵循 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 协议。
+
+---
+
+<div align="center">
+
+**基于 [Fuwari](https://github.com/saicaca/fuwari) | 由 [流转星(Betsy)](https://github.com/Besty0728) 魔改维护**
