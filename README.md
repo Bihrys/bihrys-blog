@@ -172,3 +172,5 @@ lang: zh_CN           # 指定语言 (可选)
 <div align="center">
 
 **基于 [Fuwari](https://github.com/saicaca/fuwari) | 由 [流转星(Betsy)](https://github.com/Besty0728) 魔改维护**
+
+</div>
