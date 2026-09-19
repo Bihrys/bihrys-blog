@@ -1,0 +1,97 @@
+name: 构建并部署到服务器
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SERVER_HOST: 38.246.253.34
+      SITE_ROOT: /www/wwwroot/bihrys-blog
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 配置 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建
+        run: pnpm build
+
+      - name: 打包构建产物
+        run: tar -czf /tmp/dist.tar.gz -C dist .
+
+      - name: 配置 SSH 密钥
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "::error::缺少 DEPLOY_SSH_KEY 密钥，请在仓库 Settings → Secrets 里添加"
+            exit 1
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: 上传到服务器
+        run: scp -i ~/.ssh/deploy_key /tmp/dist.tar.gz root@"$SERVER_HOST":/tmp/dist.tar.gz
+
+      - name: 服务器上原子切换新版本
+        run: |
+          ssh -i ~/.ssh/deploy_key root@"$SERVER_HOST" "SITE_ROOT=$SITE_ROOT bash -s" <<'REMOTE'
+          set -e
+          NEW="${SITE_ROOT}-new"
+          TS=$(date +%Y%m%d-%H%M%S)
+          rm -rf "$NEW"; mkdir -p "$NEW"
+          tar -xzf /tmp/dist.tar.gz -C "$NEW"
+          chown -R www:www "$NEW"
+          mv "$SITE_ROOT" "${SITE_ROOT}-old-${TS}"
+          mv "$NEW" "$SITE_ROOT"
+          chown -R www:www "$SITE_ROOT"
+          nginx -t && nginx -s reload
+          rm -f /tmp/dist.tar.gz
+          # 只保留最近 3 个历史版本
+          ls -dt ${SITE_ROOT}-old-* 2>/dev/null | tail -n +4 | xargs -r rm -rf
+          echo "部署完成：${TS}"
+          REMOTE
+
+      - name: 清理 Cloudflare 缓存
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          if [ -z "$CF_API_TOKEN" ]; then
+            echo "未配置 CF_API_TOKEN，跳过缓存清理"
+            exit 0
+          fi
+          ZONE_ID=$(curl -s "https://api.cloudflare.com/client/v4/zones?name=bihrys.com" \
+            -H "Authorization: Bearer $CF_API_TOKEN" | jq -r '.result[0].id')
+          echo "Cloudflare zone: $ZONE_ID"
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"purge_everything":true}' | jq -c '{success, errors}'
+
+      - name: 部署结果
+        run: curl -s -o /dev/null -w "线上站点：HTTP %{http_code}，缓存 %header{cf-cache-status}\n" https://bihrys.com/
