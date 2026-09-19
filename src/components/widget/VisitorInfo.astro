@@ -62,6 +62,13 @@ const style = Astro.props.style;
             <span class="info-label">浏 览 器:</span>
             <span id="browser" class="info-value">正在加载...</span>
         </div>
+        <div class="info-item">
+            <span class="icon-wrapper icon-node">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93c0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41c0 2.08-.8 3.97-2.1 5.39z"></path></svg>
+            </span>
+            <span class="info-label">CDN 节点:</span>
+            <img id="cdn-node" class="cdn-logo" alt="Detecting..." />
+        </div>
     </div>
 
     <!-- IP 纯净度检测区域 -->
@@ -127,6 +134,7 @@ const style = Astro.props.style;
     .icon-isp svg { color: #6ee7b7; }
     .icon-os svg { color: #fbbf24; }
     .icon-browser svg { color: #93c5fd; }
+    .icon-node svg { color: #c4b5fd; }
     .info-label {
         min-width: 70px;
         color: rgba(255, 255, 255, 0.7);
@@ -137,6 +145,20 @@ const style = Astro.props.style;
         overflow-wrap: break-word;
         color: rgba(255, 255, 255, 0.9);
     }
+    .cdn-logo {
+        height: 26px;
+        max-width: 110px;
+        width: auto;
+        object-fit: contain;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 4px;
+        transition: transform 0.2s ease;
+    }
+    .cdn-logo:hover {
+        transform: scale(1.05);
+    }
+
     /* IP 纯净度检测区域 */
     .ip-purity-section {
         margin-top: 0.75rem;
@@ -198,6 +220,64 @@ const style = Astro.props.style;
     // 博主位置坐标 - 中国吉林长春
     const BLOGGER_LAT = 43.8171;
     const BLOGGER_LON = 125.3235;
+
+    // CDN 资源路径
+    const CDN_IMG_CF = '/cdn/cloudflare.svg';
+    const CDN_IMG_EO = '/cdn/edgeone.png';
+    const CDN_IMG_VERCEL = '/cdn/vercel.png';
+
+    const checkCDN = async () => {
+        const imgEl = document.getElementById('cdn-node') as HTMLImageElement;
+        if (!imgEl) return;
+
+        // 本地开发环境检测
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (isLocalhost) {
+            // 本地开发时，用文字替代图片
+            const textSpan = document.createElement('span');
+            textSpan.textContent = '本地开发';
+            textSpan.className = 'info-value';
+            textSpan.style.marginLeft = '4px';
+            imgEl.replaceWith(textSpan);
+            return;
+        }
+
+        try {
+            // 发送 HEAD 请求检测响应头
+            const response = await fetch(window.location.href, { method: 'HEAD' });
+
+            // Cloudflare 官方认证的标识符
+            const cfRay = response.headers.get('cf-ray');
+            const cfCacheStatus = response.headers.get('cf-cache-status');
+
+            // EdgeOne 官方认证的标识符
+            const eoLogUuid = response.headers.get('eo-log-uuid');
+            const eoCacheStatus = response.headers.get('eo-cache-status');
+
+            // Vercel 官方认证的标识符
+            const vercelId = response.headers.get('x-vercel-id');
+            const vercelCache = response.headers.get('x-vercel-cache');
+
+            if (cfRay || cfCacheStatus) {
+                imgEl.src = CDN_IMG_CF;
+                imgEl.alt = 'Cloudflare';
+            } else if (eoLogUuid || eoCacheStatus) {
+                imgEl.src = CDN_IMG_EO;
+                imgEl.alt = 'EdgeOne';
+            } else if (vercelId || vercelCache) {
+                imgEl.src = CDN_IMG_VERCEL;
+                imgEl.alt = 'Vercel';
+                imgEl.style.height = '14px';
+                imgEl.style.width = 'auto';
+            } else {
+                imgEl.style.display = 'none';
+                imgEl.alt = 'Unknown CDN';
+            }
+        } catch (e) {
+            console.error('CDN detection failed:', e);
+            imgEl.style.display = 'none';
+        }
+    };
 
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
         const R = 6371;
@@ -353,6 +433,8 @@ const style = Astro.props.style;
     const fetchIpInfo = async () => {
         setInfo('os', getOS());
         setInfo('browser', getBrowser());
+        // 启动 CDN 检测
+        checkCDN();
 
         let finalData: ParsedData = {};
 
