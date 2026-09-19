@@ -128,11 +128,11 @@ export const imageFallbackConfig: ImageFallbackConfig = {
 	fallbackDomain: "",
 };
 
-// 统计服务：暂时关闭（浏览量/热门排行相关功能不生效）
+// 统计服务：自建 Umami（umami.bihrys.com）
 export const umamiConfig: UmamiConfig = {
-	enable: false,
-	baseUrl: "",
-	shareId: "",
+	enable: true,
+	baseUrl: "https://umami.bihrys.com",
+	shareId: "8gQID6k4hHuanwjO",
 	timezone: "Asia/Shanghai",
 };
 
