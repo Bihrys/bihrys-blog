@@ -70,8 +70,11 @@ jobs:
           chown -R www:www "$SITE_ROOT"
           nginx -t && nginx -s reload
           rm -f /tmp/dist.tar.gz
-          # 只保留最近 3 个历史版本
-          ls -dt ${SITE_ROOT}-old-* 2>/dev/null | tail -n +4 | xargs -r rm -rf
+          # 只保留最近 3 个历史版本（宝塔的 .user.ini 是 immutable 属性，需先解锁；失败也不影响部署）
+          ls -dt ${SITE_ROOT}-old-* 2>/dev/null | tail -n +4 | while read -r dir; do
+            chattr -i "$dir/.user.ini" 2>/dev/null || true
+            rm -rf "$dir" 2>/dev/null || true
+          done
           echo "部署完成：${TS}"
           REMOTE
 
