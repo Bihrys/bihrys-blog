@@ -37,7 +37,7 @@
 
 记住，代码确然是我们最终用来表达需求的那种语言。我们可以创造各种与需求接近的语言。我们可以创造帮助把需求解析和汇整为正式结构的各种工具。然而，我们永远无法抛弃必要的精确性——所以代码永存。
 
-::github{repo="Bihrys/fuwari"}
+::github{repo="Bihrys/bihrys-blog"}
 
 > ### Sources of images used in this site
 > - [散々でいる - イラスト](https://x.com/Haru57928031/status/1553704618634670081/) [「晴れのちラムネ🎸𓈒𓏸」](https://x.com/Haru57928031/status/1738144926268092672/) by [Haる](https://x.com/Haru57928031)
