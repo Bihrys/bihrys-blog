@@ -28,7 +28,7 @@ jobs:
       - name: 配置 Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: 更新 GitHub 贡献数据
         env:
