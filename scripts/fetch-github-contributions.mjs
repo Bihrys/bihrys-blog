@@ -16,6 +16,8 @@ import { fileURLToPath } from "node:url";
 
 const USERNAME = "Bihrys";
 const TIMEOUT_MS = 15000;
+// 头像使用本站本地图片（GitHub 直链在国内加载慢，图片在 public/images/github-avatar.jpg）
+const LOCAL_AVATAR_URL = "/images/github-avatar.jpg";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_PATH = join(
@@ -98,7 +100,8 @@ async function fetchFromGraphQL(token) {
 
 	return {
 		name: user.name || null,
-		avatarUrl: user.avatarUrl || `https://github.com/${USERNAME}.png`,
+		// 本地头像（GitHub 直链在国内加载慢，头像已下载到 public/images/）
+		avatarUrl: LOCAL_AVATAR_URL,
 		total: calendar.totalContributions,
 		days,
 	};
@@ -125,10 +128,10 @@ async function fetchFromJogruber() {
 	}));
 
 	// jogruber 接口不返回展示名和头像，展示名留空由前端回退为用户名，
-	// 头像直接用 GitHub 的免鉴权头像地址（稳定、无需 token）。
+	// 头像统一使用本站本地图片（GitHub 直链在国内访问很慢）。
 	return {
 		name: null,
-		avatarUrl: `https://github.com/${USERNAME}.png`,
+		avatarUrl: LOCAL_AVATAR_URL,
 		total: json.total?.lastYear ?? 0,
 		days,
 	};
