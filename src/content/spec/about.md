@@ -2,7 +2,7 @@
 
 你好，我是 Bihrys。这里是记录技术折腾、Linux 使用和日常随笔的地方——把踩过的坑写下来，既是备忘，也希望对你有点用。
 
-- GitHub：[github.com/Bihrys](https://github.com/Bihrys)
+- GitHub：[Bihrys](https://github.com/Bihrys)
 - Bilibili：[bilibili.com](https://space.bilibili.com/1124230309)
 - 邮箱：[3200769991@qq.com](mailto:3200769991@qq.com)
 
@@ -39,6 +39,7 @@
 ::github{repo="Bihrys/bihrys-blog"}
 
 > ### Sources of images used in this site
+>
 > - [散々でいる - イラスト](https://x.com/Haru57928031/status/1553704618634670081/) [「晴れのちラムネ🎸𓈒𓏸」](https://x.com/Haru57928031/status/1738144926268092672/) by [Haる](https://x.com/Haru57928031)
 
 <details>
