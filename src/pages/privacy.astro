@@ -6,7 +6,7 @@ import { getEntry } from "astro:content";
 import { render } from "astro:content";
 import Markdown from "@components/misc/Markdown.astro";
 
-const aboutPost = await getEntry("spec", "about-privacy");
+const aboutPost = await getEntry("spec", "privacy");
 
 if (!aboutPost) {
 	throw new Error("Privacy page content not found");

@@ -36,6 +36,9 @@ export default defineConfig({
     site: "https://bihrys.com",
     base: "/",
     trailingSlash: "always",
+    redirects: {
+        "/about-privacy/": "/privacy/",
+    },
     integrations: [tailwind({
         nesting: true,
     }), swup({
