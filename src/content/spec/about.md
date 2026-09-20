@@ -4,8 +4,7 @@
 
 - GitHub：[github.com/Bihrys](https://github.com/Bihrys)
 - Bilibili：[space.bilibili.com/1124230309](https://space.bilibili.com/1124230309)
-- 邮箱：3200769991@qq.com
-- 隐私政策：[关于 & 隐私政策](/about-privacy/)
+- 邮箱：[3200769991@qq.com](mailto:3200769991@qq.com)
 
 ---
 
