@@ -3,7 +3,7 @@
 你好，我是 Bihrys。这里是记录技术折腾、Linux 使用和日常随笔的地方——把踩过的坑写下来，既是备忘，也希望对你有点用。
 
 - GitHub：[github.com/Bihrys](https://github.com/Bihrys)
-- Bilibili：[space.bilibili.com/1124230309](https://space.bilibili.com/1124230309)
+- Bilibili：[bilibili.com](https://space.bilibili.com/1124230309)
 - 邮箱：[3200769991@qq.com](mailto:3200769991@qq.com)
 
 ---
