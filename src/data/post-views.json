@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "slug": "about-my-girlfriend",
+    "views": 16
+  },
+  {
+    "slug": "uuid-swap-mod",
+    "views": 16
+  },
+  {
+    "slug": "how-to-ask-questions-the-smart-way",
+    "views": 8
+  },
+  {
+    "slug": "a-problem-during-c-programming",
+    "views": 6
+  },
+  {
+    "slug": "hello-world",
+    "views": 5
+  },
+  {
+    "slug": "how-to-become-a-hacker",
+    "views": 4
+  },
+  {
+    "slug": "mnist-neural-net-visualizer",
+    "views": 2
+  },
+  {
+    "slug": "draft",
+    "views": 0
+  },
+  {
+    "slug": "expressive-code",
+    "views": 0
+  },
+  {
+    "slug": "markdown-extended",
+    "views": 0
+  },
+  {
+    "slug": "markdown",
+    "views": 0
+  },
+  {
+    "slug": "video",
+    "views": 0
+  }
+]
