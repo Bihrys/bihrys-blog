@@ -234,8 +234,9 @@ jobs:
           if git diff --quiet; then
             echo "No order changes needed."
           else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
+            # 使用博主本人身份提交，确保计入 GitHub 贡献墙（机器人邮箱不会被计入）
+            git config user.name "Eric Bai"
+            git config user.email "3200769991@qq.com"
             git add src/content/friends/_order.json
             git commit -m "chore: update friends order"
             git push origin main
