@@ -130,10 +130,10 @@ const { remarkPluginFrontmatter } = await entry.render();
 </div>
 <div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 md:hidden"></div>
 
-<script define:vars={{ entry, umamiConfig }}>
+<script define:vars={{ slug: entry.slug, umamiConfig }}>
     // 3D 悬浮视差效果
     function initTiltEffect() {
-        const card = document.getElementById(`post-card-${entry.slug}`);
+        const card = document.getElementById(`post-card-${slug}`);
         if (!card) return;
 
         const tiltElement = card.querySelector('.tilt-card');
@@ -254,7 +254,7 @@ const { remarkPluginFrontmatter } = await entry.render();
         });
 
         // 观察当前组件的根元素
-        const card = document.getElementById(`post-card-${entry.slug}`);
+        const card = document.getElementById(`post-card-${slug}`);
         if (card) {
             observer.observe(card);
         }
