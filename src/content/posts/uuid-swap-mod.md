@@ -60,7 +60,7 @@ lang: 'zh_CN'
 
 常用命令：
 
-```
+```text
 /uuidswap                              # 打开 GUI，用所选玩家的数据替换自己
 /uuidswap list                         # 列出已知玩家、UUID 和在线状态
 /uuidswap <targetUuid>                 # 用目标 UUID 的数据替换自己
