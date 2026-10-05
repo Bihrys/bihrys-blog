@@ -108,7 +108,7 @@ const githubProfileUrl = `https://github.com/${data.username}`;
                     ))}
                 </div>
 
-                <div class="grid grid-flow-col grid-rows-[repeat(7,10px)] gap-[3px]">
+                <div class="grid grid-flow-col grid-rows-[repeat(7,10px)] gap-[3px] w-max justify-start">
                     {Array.from({ length: leadingBlanks }).map(() => <div class="w-[10px] h-[10px]"></div>)}
                     {data.days.map((day) => (
                         <div
