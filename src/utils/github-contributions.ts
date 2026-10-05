@@ -4,6 +4,8 @@ export type ContributionData = {
 	name: string | null;
 	avatarUrl: string;
 	total: number;
+	// 展示的年份范围（如 [2025, 2026]）；旧数据文件里可能没有该字段
+	years?: number[];
 	updatedAt: string;
 	days: ContributionDay[];
 };

@@ -1,5 +1,7 @@
 /**
- * 抓取 GitHub 用户近一年的贡献热力图数据，写入 src/data/github-contributions.json。
+ * 抓取 GitHub 用户近两年的贡献热力图数据，写入 src/data/github-contributions.json。
+ *
+ * 展示范围：去年 + 今年（按自然年拼接，卡片内可左右翻）
  *
  * 数据源优先级：
  *   A. GitHub GraphQL API（仅当存在 GITHUB_TOKEN 环境变量时使用）
@@ -16,6 +18,8 @@ import { fileURLToPath } from "node:url";
 
 const USERNAME = "Bihrys";
 const TIMEOUT_MS = 15000;
+// 展示几年：默认"去年 + 今年"，拼成一条可左右翻的长图
+const SHOW_YEARS = 2;
 // 头像使用本站本地图片（GitHub 直链在国内加载慢，图片在 public/images/github-avatar.jpg）
 const LOCAL_AVATAR_URL = "/images/github-avatar.jpg";
 
@@ -38,15 +42,52 @@ const GRAPHQL_LEVEL_MAP = {
 };
 
 /**
- * 数据源 A：GitHub GraphQL API（需要 token）
+ * 需要抓取的年份列表：去年 + 今年（按 UTC 判断）
  */
-async function fetchFromGraphQL(token) {
+function targetYears() {
+	const thisYear = new Date().getUTCFullYear();
+	const years = [];
+	for (let offset = SHOW_YEARS - 1; offset >= 0; offset -= 1) {
+		years.push(thisYear - offset);
+	}
+	return years;
+}
+
+/**
+ * 某一年的查询区间：1/1 ~ 12/31，但今年会截断到今天（避免出现一堆未来的空格）
+ */
+function yearRange(year) {
+	const from = new Date(Date.UTC(year, 0, 1));
+	const endOfYear = new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+	const now = new Date();
+	const to = endOfYear.getTime() > now.getTime() ? now : endOfYear;
+	return { from: from.toISOString(), to: to.toISOString() };
+}
+
+/**
+ * 按日期去重（同一日期保留最后一次出现）+ 升序排列，保证网格能按周对齐
+ */
+function normalizeDays(days) {
+	const byDate = new Map();
+	for (const day of days) {
+		if (day && typeof day.date === "string") {
+			byDate.set(day.date, day);
+		}
+	}
+	return [...byDate.values()].sort((a, b) =>
+		a.date < b.date ? -1 : a.date > b.date ? 1 : 0,
+	);
+}
+
+/**
+ * 数据源 A 的单次请求：GraphQL，区间最长一年
+ */
+async function queryGraphQL(token, from, to) {
 	const query = `
-		query($login: String!) {
+		query($login: String!, $from: DateTime!, $to: DateTime!) {
 			user(login: $login) {
 				name
-				avatarUrl
-				contributionsCollection {
+				contributionsCollection(from: $from, to: $to) {
 					contributionCalendar {
 						totalContributions
 						weeks {
@@ -69,7 +110,7 @@ async function fetchFromGraphQL(token) {
 			"Content-Type": "application/json",
 			"User-Agent": "fuwari-contributions-fetcher",
 		},
-		body: JSON.stringify({ query, variables: { login: USERNAME } }),
+		body: JSON.stringify({ query, variables: { login: USERNAME, from, to } }),
 		signal: AbortSignal.timeout(TIMEOUT_MS),
 	});
 
@@ -90,59 +131,86 @@ async function fetchFromGraphQL(token) {
 		throw new Error("GraphQL 响应缺少 contributionCalendar 字段");
 	}
 
-	const days = calendar.weeks.flatMap((week) =>
-		week.contributionDays.map((day) => ({
-			date: day.date,
-			count: day.contributionCount,
-			level: GRAPHQL_LEVEL_MAP[day.contributionLevel] ?? 0,
-		})),
-	);
+	return { name: user?.name || null, calendar };
+}
+
+/**
+ * 数据源 A：GitHub GraphQL API（需要 token），逐年份请求后合并
+ */
+async function fetchFromGraphQL(token) {
+	const collected = [];
+	let total = 0;
+	let name = null;
+
+	for (const year of targetYears()) {
+		const { from, to } = yearRange(year);
+		const { name: userName, calendar } = await queryGraphQL(token, from, to);
+		if (userName) name = userName;
+		total += calendar.totalContributions ?? 0;
+		for (const week of calendar.weeks) {
+			for (const day of week.contributionDays) {
+				collected.push({
+					date: day.date,
+					count: day.contributionCount,
+					level: GRAPHQL_LEVEL_MAP[day.contributionLevel] ?? 0,
+				});
+			}
+		}
+	}
 
 	return {
-		name: user.name || null,
+		name,
 		// 本地头像（GitHub 直链在国内加载慢，头像已下载到 public/images/）
 		avatarUrl: LOCAL_AVATAR_URL,
-		total: calendar.totalContributions,
-		days,
+		total,
+		days: normalizeDays(collected),
 	};
 }
 
 /**
- * 数据源 B：jogruber 第三方接口（无需 token）
+ * 数据源 B：jogruber 第三方接口（无需 token），逐年份请求后合并
  */
 async function fetchFromJogruber() {
-	const res = await fetch(
-		`https://github-contributions-api.jogruber.de/v4/${USERNAME}?y=last`,
-		{ signal: AbortSignal.timeout(TIMEOUT_MS) },
-	);
+	const collected = [];
+	let total = 0;
 
-	if (!res.ok) {
-		throw new Error(`jogruber HTTP ${res.status} ${res.statusText}`);
+	for (const year of targetYears()) {
+		const res = await fetch(
+			`https://github-contributions-api.jogruber.de/v4/${USERNAME}?y=${year}`,
+			{ signal: AbortSignal.timeout(TIMEOUT_MS) },
+		);
+
+		if (!res.ok) {
+			throw new Error(
+				`jogruber HTTP ${res.status} ${res.statusText} (${year} 年)`,
+			);
+		}
+
+		const json = await res.json();
+		total += json.total?.[String(year)] ?? 0;
+		for (const day of json.contributions || []) {
+			collected.push({ date: day.date, count: day.count, level: day.level });
+		}
 	}
-
-	const json = await res.json();
-	const days = (json.contributions || []).map((day) => ({
-		date: day.date,
-		count: day.count,
-		level: day.level,
-	}));
 
 	// jogruber 接口不返回展示名和头像，展示名留空由前端回退为用户名，
 	// 头像统一使用本站本地图片（GitHub 直链在国内访问很慢）。
 	return {
 		name: null,
 		avatarUrl: LOCAL_AVATAR_URL,
-		total: json.total?.lastYear ?? 0,
-		days,
+		total,
+		days: normalizeDays(collected),
 	};
 }
 
 /**
- * 基本合理性校验：避免把畸形数据当作有效结果写入文件
+ * 基本合理性校验：避免把畸形数据当作有效结果写入文件。
+ * 天数按"每年 300~400 天"估算（今年未过完时天数偏少属正常）。
  */
 function isValid(result) {
 	if (!result || !Array.isArray(result.days)) return false;
-	if (result.days.length < 300 || result.days.length > 400) return false;
+	if (result.days.length < 300 * SHOW_YEARS) return false;
+	if (result.days.length > 400 * SHOW_YEARS) return false;
 	if (typeof result.avatarUrl !== "string" || !result.avatarUrl) return false;
 	return result.days.every(
 		(d) =>
@@ -163,11 +231,14 @@ function loadExisting() {
 
 function writeResult(result) {
 	mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
+	const years = targetYears();
 	const data = {
 		username: USERNAME,
 		name: result.name,
 		avatarUrl: result.avatarUrl,
 		total: result.total,
+		// 展示的年份范围，供组件生成文案（如「2025–2026 共 X 次贡献」）
+		years,
 		updatedAt: new Date().toISOString(),
 		days: result.days,
 	};
@@ -224,8 +295,10 @@ async function main() {
 
 	const data = writeResult(result);
 	console.log(`✅ 数据源: ${source}`);
+	console.log(`   年份: ${data.years.join(", ")}`);
 	console.log(`   total: ${data.total}`);
 	console.log(`   days: ${data.days.length}`);
+	console.log(`   范围: ${data.days[0]?.date} ~ ${data.days[data.days.length - 1]?.date}`);
 	console.log(`   写入路径: ${OUTPUT_PATH}`);
 }
 

@@ -48,22 +48,46 @@ interface MonthLabel {
 }
 const monthLabels: MonthLabel[] = [];
 let lastMonth = -1;
+let lastYear = -1;
 let lastLabelColumn = Number.NEGATIVE_INFINITY;
 // 数据起始日通常落在某月中旬（如 7/27），这个残缺首月只占一两列。
 // 若为它标注月份，紧随其后的完整月份会因间距不足被跳过（Aug 丢失），与 GitHub 的显示不符。
 const startsMidMonth = firstDay
 	? new Date(`${firstDay.date}T00:00:00Z`).getUTCDate() !== 1
 	: false;
+// 多年拼接时同一个月名会重复出现（2025-01 与 2026-01 都叫 Jan），
+// 所以每年第一列改为显示年份，用来区分；年份标签不参与防重叠的跳过逻辑。
 data.days.forEach((day, index) => {
-	const month = new Date(`${day.date}T00:00:00Z`).getUTCMonth();
-	if (month === lastMonth) return;
+	const date = new Date(`${day.date}T00:00:00Z`);
+	const month = date.getUTCMonth();
+	const year = date.getUTCFullYear();
+	const yearChanged = year !== lastYear;
+	lastYear = year;
+	if (!yearChanged && month === lastMonth) return;
 	lastMonth = month;
-	if (index === 0 && startsMidMonth) return;
 	const column = Math.floor((leadingBlanks + index) / WEEK_DAYS);
+	if (yearChanged) {
+		if (column - lastLabelColumn >= 1) {
+			lastLabelColumn = column;
+			monthLabels.push({ label: String(year), column });
+		}
+		return;
+	}
+	if (index === 0 && startsMidMonth) return;
 	if (column - lastLabelColumn < 2) return;
 	lastLabelColumn = column;
 	monthLabels.push({ label: MONTH_NAMES[month] ?? "", column });
 });
+
+// 副标题文案：新数据带 years（如 [2025, 2026]），旧数据文件回退为「过去一年」
+const years =
+	Array.isArray(data.years) && data.years.length > 0 ? data.years : [];
+const rangeLabel =
+	years.length === 0
+		? "过去一年"
+		: years.length === 1
+			? `${years[0]} 年`
+			: `${years[0]}–${years[years.length - 1]}`;
 
 function tooltipOf(date: string, count: number): string {
 	return `${date}：${count > 0 ? `${count} 次贡献` : "无贡献"}`;
@@ -81,7 +105,7 @@ const githubProfileUrl = `https://github.com/${data.username}`;
         </a>
         <div class="min-w-0 flex-1">
             <a href={githubProfileUrl} target="_blank" rel="noopener" class="font-bold text-sm text-90 hover:text-[var(--primary)] transition truncate block">{displayName}</a>
-            <div class="text-xs text-30">过去一年共 <span class="text-[var(--primary)] font-medium">{data.total.toLocaleString()}</span> 次贡献</div>
+            <div class="text-xs text-30">{rangeLabel} 共 <span class="text-[var(--primary)] font-medium">{data.total.toLocaleString()}</span> 次贡献</div>
         </div>
         <button
             type="button"
@@ -122,12 +146,36 @@ const githubProfileUrl = `https://github.com/${data.username}`;
         </div>
     </div>
 
-    <div class="flex items-center justify-end gap-1 mt-3 text-[10px] text-30">
-        <span>Less</span>
-        {[0, 1, 2, 3, 4].map((level) => (
-            <span class="gh-contrib-legend inline-block w-[10px] h-[10px] rounded-[2px]" data-level={level}></span>
-        ))}
-        <span>More</span>
+    <div class="flex items-center justify-between gap-2 mt-3 text-[10px] text-30">
+        <!-- 多年拼接后整条图比卡片宽，这里给桌面端一个显式的左右翻页入口
+             （移动端直接手势滑动即可，滚动条由 hide-scrollbar 隐藏） -->
+        <div class="flex items-center gap-1">
+            <button
+                type="button"
+                class="gh-contrib-nav inline-flex items-center justify-center w-6 h-6 rounded-md border border-[var(--line-divider)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition cursor-pointer select-none"
+                data-direction="-1"
+                aria-label="向前翻（更早）"
+                title="向前翻（更早）"
+            >
+                <Icon name="material-symbols:chevron-left-rounded" class="text-[1rem]" />
+            </button>
+            <button
+                type="button"
+                class="gh-contrib-nav inline-flex items-center justify-center w-6 h-6 rounded-md border border-[var(--line-divider)] hover:text-[var(--primary)] hover:border-[var(--primary)] transition cursor-pointer select-none"
+                data-direction="1"
+                aria-label="向后翻（更新）"
+                title="向后翻（更新）"
+            >
+                <Icon name="material-symbols:chevron-right-rounded" class="text-[1rem]" />
+            </button>
+        </div>
+        <div class="flex items-center gap-1">
+            <span>Less</span>
+            {[0, 1, 2, 3, 4].map((level) => (
+                <span class="gh-contrib-legend inline-block w-[10px] h-[10px] rounded-[2px]" data-level={level}></span>
+            ))}
+            <span>More</span>
+        </div>
     </div>
 </div>
 
@@ -150,6 +198,16 @@ const githubProfileUrl = `https://github.com/${data.username}`;
         --ghc-l2: #006d32;
         --ghc-l3: #26a641;
         --ghc-l4: #39d353;
+    }
+
+    /* 多年拼接后可横向翻阅：给滚动区抓取光标提示 */
+    .gh-contrib-scroll {
+        cursor: grab;
+    }
+
+    .gh-contrib-scroll.is-dragging {
+        cursor: grabbing;
+        user-select: none;
     }
 
     .gh-contrib-cell,
@@ -188,6 +246,51 @@ const githubProfileUrl = `https://github.com/${data.username}`;
 
     // Footer 在 DOM 里同时存在两份（lg+ 一份、<lg 一份，靠 CSS 控制可见性），
     // 必须遍历所有 .gh-contrib 实例逐个处理，不能用 getElementById 只处理第一份。
+    // 多年拼接后整条图比卡片宽：绑定「左右翻页按钮」与「鼠标拖拽」两种翻阅方式
+    // （移动端交给原生手势滑动，这里跳过触摸事件避免和惯性滚动打架）
+    function bindScrollerControls(el, scroller) {
+        if (!scroller) return;
+
+        el.querySelectorAll(".gh-contrib-nav").forEach(function (btn) {
+            if (btn.dataset.bound) return;
+            btn.dataset.bound = "true";
+            btn.addEventListener("click", function () {
+                var step = Math.max(120, Math.round(scroller.clientWidth * 0.8));
+                var direction = Number(btn.dataset.direction) || 1;
+                if (typeof scroller.scrollBy === "function") {
+                    scroller.scrollBy({ left: direction * step, behavior: "smooth" });
+                } else {
+                    scroller.scrollLeft += direction * step;
+                }
+            });
+        });
+
+        if (scroller.dataset.dragBound) return;
+        scroller.dataset.dragBound = "true";
+
+        var dragging = false;
+        var startX = 0;
+        var startLeft = 0;
+
+        scroller.addEventListener("pointerdown", function (event) {
+            if (event.pointerType === "touch") return;
+            dragging = true;
+            startX = event.clientX;
+            startLeft = scroller.scrollLeft;
+            scroller.classList.add("is-dragging");
+        });
+
+        window.addEventListener("pointermove", function (event) {
+            if (!dragging) return;
+            scroller.scrollLeft = startLeft - (event.clientX - startX);
+        });
+
+        window.addEventListener("pointerup", function () {
+            dragging = false;
+            scroller.classList.remove("is-dragging");
+        });
+    }
+
     function initGhContrib() {
         var palette = localStorage.getItem(PALETTE_KEY) === "github" ? "github" : "theme";
         document.querySelectorAll(".gh-contrib").forEach(function (el) {
@@ -196,6 +299,7 @@ const githubProfileUrl = `https://github.com/${data.username}`;
             // Swup 每次导航后都要重新把滚动条定位到最新日期（最右侧）
             var scroller = el.querySelector(".gh-contrib-scroll");
             if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+            bindScrollerControls(el, scroller);
 
             var btn = el.querySelector(".gh-contrib-palette-btn");
             if (!btn || btn.dataset.bound) return;
