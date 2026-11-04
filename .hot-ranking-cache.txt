@@ -1,1 +1,1 @@
-uuid-swap-mod,about-my-girlfriend,how-to-ask-questions-the-smart-way,hello-world,mnist-neural-net-visualizer
+uuid-swap-mod,about-my-girlfriend,mnist-neural-net-visualizer,how-to-ask-questions-the-smart-way,hello-world
