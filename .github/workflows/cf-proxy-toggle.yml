@@ -1,0 +1,64 @@
+name: 切换主站 CDN 代理（灰云/橙云）
+
+on:
+  workflow_dispatch:
+    inputs:
+      proxied:
+        description: "true=橙云(走 CDN 代理) false=灰云(DNS only 直连源站)"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      record:
+        description: "要切换的域名（默认主站）"
+        required: false
+        default: "bihrys.com"
+
+permissions:
+  contents: read
+
+jobs:
+  toggle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 切换 Cloudflare 代理状态
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          TARGET: ${{ inputs.proxied }}
+          RECORD: ${{ inputs.record }}
+        run: |
+          set -euo pipefail
+          API="https://api.cloudflare.com/client/v4"
+          if [ -z "${CF_API_TOKEN:-}" ]; then
+            echo "::error::缺少 CF_API_TOKEN 密钥"
+            exit 1
+          fi
+
+          ZONE_ID=$(curl -sS "$API/zones?name=bihrys.com" \
+            -H "Authorization: Bearer $CF_API_TOKEN" | jq -r '.result[0].id // empty')
+          if [ -z "$ZONE_ID" ]; then
+            echo "::error::拿不到 zone（token 可能缺少 Zone:Read）"
+            exit 1
+          fi
+          echo "zone=$ZONE_ID"
+
+          REC=$(curl -sS "$API/zones/$ZONE_ID/dns_records?name=$RECORD" \
+            -H "Authorization: Bearer $CF_API_TOKEN")
+          echo "$REC" | jq -r '.result[] | "  现有: \(.type) \(.name) -> \(.content) proxied=\(.proxied)"'
+
+          for ID in $(echo "$REC" | jq -r '.result[].id'); do
+            RES=$(curl -sS -X PATCH "$API/zones/$ZONE_ID/dns_records/$ID" \
+              -H "Authorization: Bearer $CF_API_TOKEN" -H 'Content-Type: application/json' \
+              --data "{\"proxied\": $TARGET}")
+            echo "$RES" | jq -r 'if .success then "  ✅ \(.result.type) \(.result.name) -> proxied=\(.result.proxied)"
+                                 else "  ❌ " + (.errors|tostring) end'
+          done
+
+          echo
+          echo "=== 切换后的记录 ==="
+          curl -sS "$API/zones/$ZONE_ID/dns_records?name=$RECORD" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            | jq -r '.result[] | "  \(.type) \(.name) -> \(.content) proxied=\(.proxied)"'
