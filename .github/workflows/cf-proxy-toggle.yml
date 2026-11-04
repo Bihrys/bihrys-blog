@@ -59,13 +59,23 @@ jobs:
             -H "Authorization: Bearer $CF_API_TOKEN")
           echo "$REC" | jq -r '.result[] | "  现有: \(.type) \(.name) -> \(.content) proxied=\(.proxied)"'
 
+          FAILED=0
           for ID in $(echo "$REC" | jq -r '.result[].id'); do
             RES=$(curl -sS -X PATCH "$API/zones/$ZONE_ID/dns_records/$ID" \
               -H "Authorization: Bearer $CF_API_TOKEN" -H 'Content-Type: application/json' \
               --data "$BODY")
-            echo "$RES" | jq -r 'if .success then "  ✅ \(.result.type) \(.result.name) -> proxied=\(.result.proxied)"
-                                 else "  ❌ " + (.errors|tostring) end'
+            if echo "$RES" | jq -e '.success' >/dev/null 2>&1; then
+              echo "$RES" | jq -r '"  ✅ \(.result.type) \(.result.name) -> \(.result.content) proxied=\(.result.proxied)"'
+            else
+              echo "  ❌ 切换失败: $(echo "$RES" | jq -c '.errors')"
+              FAILED=1
+            fi
           done
+
+          if [ "$FAILED" -ne 0 ]; then
+            echo "::error::存在切换失败的记录（常见原因：token 缺少 Zone.DNS:Edit 权限）"
+            exit 1
+          fi
 
           echo
           echo "=== 切换后的记录 ==="
