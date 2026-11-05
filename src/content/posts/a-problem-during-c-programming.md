@@ -5,7 +5,7 @@ description: '数组越界不报错？有点意思'
 image: ''
 tags: [Programming, C]
 category: 'Journals'
-draft: false 
+draft: true
 lang: ''
 ---
 

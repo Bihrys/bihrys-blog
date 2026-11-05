@@ -5,7 +5,7 @@ description: 'Niri 窗口管理器的安装配置以及踩坑备忘录'
 image: ''
 tags: [Linux, Niri]
 category: 'Linux'
-draft: false 
+draft: true
 lang: ''
 ---
 
