@@ -1,31 +1,31 @@
 [
   {
     "slug": "uuid-swap-mod",
-    "views": 43
+    "views": 46
   },
   {
     "slug": "about-my-girlfriend",
     "views": 18
   },
   {
-    "slug": "mnist-neural-net-visualizer",
-    "views": 10
-  },
-  {
-    "slug": "how-to-ask-questions-the-smart-way",
-    "views": 8
-  },
-  {
     "slug": "hello-world",
-    "views": 7
-  },
-  {
-    "slug": "a-problem-during-c-programming",
-    "views": 6
+    "views": 16
   },
   {
     "slug": "how-to-become-a-hacker",
-    "views": 5
+    "views": 13
+  },
+  {
+    "slug": "a-problem-during-c-programming",
+    "views": 11
+  },
+  {
+    "slug": "how-to-ask-questions-the-smart-way",
+    "views": 11
+  },
+  {
+    "slug": "mnist-neural-net-visualizer",
+    "views": 10
   },
   {
     "slug": "draft",
