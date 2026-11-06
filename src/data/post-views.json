@@ -1,7 +1,7 @@
 [
   {
     "slug": "uuid-swap-mod",
-    "views": 46
+    "views": 51
   },
   {
     "slug": "about-my-girlfriend",
@@ -12,6 +12,10 @@
     "views": 16
   },
   {
+    "slug": "how-to-ask-questions-the-smart-way",
+    "views": 14
+  },
+  {
     "slug": "how-to-become-a-hacker",
     "views": 13
   },
@@ -20,12 +24,12 @@
     "views": 11
   },
   {
-    "slug": "how-to-ask-questions-the-smart-way",
-    "views": 11
-  },
-  {
     "slug": "mnist-neural-net-visualizer",
     "views": 10
+  },
+  {
+    "slug": "josephus-problem",
+    "views": 3
   },
   {
     "slug": "draft",
