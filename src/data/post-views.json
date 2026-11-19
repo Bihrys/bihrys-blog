@@ -8,6 +8,10 @@
     "views": 18
   },
   {
+    "slug": "how-to-become-a-hacker",
+    "views": 18
+  },
+  {
     "slug": "hello-world",
     "views": 16
   },
@@ -16,7 +20,7 @@
     "views": 14
   },
   {
-    "slug": "how-to-become-a-hacker",
+    "slug": "big-number-arithmetic",
     "views": 13
   },
   {
@@ -29,7 +33,7 @@
   },
   {
     "slug": "josephus-problem",
-    "views": 3
+    "views": 6
   },
   {
     "slug": "draft",
